@@ -1,18 +1,22 @@
+
 import * as React from 'react';
 import styles from './Solutions.module.scss';
 
 import { SharePointService } from '../services/SharePointService';
+import { WebPartContext } from '@microsoft/sp-webpart-base';
 
 import {
-  Search,
-  ArrowLeft,
-  SlidersHorizontal,
-  Star,
-  ThumbsUp,
-  ArrowRight
-} from 'lucide-react';
-
-import { WebPartContext } from '@microsoft/sp-webpart-base';
+  DefaultButton,
+  PrimaryButton,
+  TextField,
+  Dropdown,
+  IDropdownOption,
+  Spinner,
+  SpinnerSize,
+  MessageBar,
+  MessageBarType,
+  IconButton
+} from '@fluentui/react';
 
 interface ISolution {
   Id: number;
@@ -26,7 +30,6 @@ interface ISolution {
   IsFavorite: boolean;
   Status: string;
   Created: string;
-
   Author?: {
     Id: number;
     Title: string;
@@ -50,9 +53,10 @@ interface ISolutionsState {
   difficulty: string;
 }
 
-export default class Solutions
-  extends React.Component<ISolutionsProps, ISolutionsState> {
-
+export default class Solutions extends React.Component<
+  ISolutionsProps,
+  ISolutionsState
+> {
   private sharePointService: SharePointService;
 
   public state: ISolutionsState = {
@@ -67,29 +71,19 @@ export default class Solutions
 
   constructor(props: ISolutionsProps) {
     super(props);
-
-    this.sharePointService =
-      new SharePointService(props.context);
+    this.sharePointService = new SharePointService(props.context);
   }
 
   public async componentDidMount(): Promise<void> {
-
     try {
-
-      const solutions =
-        await this.sharePointService.getSolutions();
+      const solutions = await this.sharePointService.getSolutions();
 
       this.setState({
         solutions: solutions as ISolution[],
         loading: false
       });
-
     } catch (error) {
-
-      console.error(
-        'Error loading solutions:',
-        error
-      );
+      console.error('Error loading solutions:', error);
 
       this.setState({
         loading: false,
@@ -99,7 +93,6 @@ export default class Solutions
   }
 
   private getFilteredSolutions(): ISolution[] {
-
     const {
       solutions,
       search,
@@ -108,41 +101,28 @@ export default class Solutions
       difficulty
     } = this.state;
 
-    const searchText =
-      search.trim().toLowerCase();
+    const searchText = search.trim().toLowerCase();
 
     return solutions.filter(solution => {
-
       if (solution.Status !== 'Published') {
         return false;
       }
 
       const matchesSearch =
         !searchText ||
-        solution.Title
-          .toLowerCase()
-          .includes(searchText) ||
-        solution.Technology
-          .toLowerCase()
-          .includes(searchText) ||
-        solution.Category
-          .toLowerCase()
-          .includes(searchText) ||
-        solution.Problem
-          .toLowerCase()
-          .includes(searchText);
+        (solution.Title || '').toLowerCase().includes(searchText) ||
+        (solution.Technology || '').toLowerCase().includes(searchText) ||
+        (solution.Category || '').toLowerCase().includes(searchText) ||
+        (solution.Problem || '').toLowerCase().includes(searchText);
 
       const matchesTechnology =
-        !technology ||
-        solution.Technology === technology;
+        !technology || solution.Technology === technology;
 
       const matchesCategory =
-        !category ||
-        solution.Category === category;
+        !category || solution.Category === category;
 
       const matchesDifficulty =
-        !difficulty ||
-        solution.Difficulty === difficulty;
+        !difficulty || solution.Difficulty === difficulty;
 
       return (
         matchesSearch &&
@@ -153,28 +133,29 @@ export default class Solutions
     });
   }
 
-  private getDifficultyClass(
-    difficulty: string
-  ): string {
-
+  private getDifficultyClass(difficulty: string): string {
     switch (difficulty) {
-
       case 'Easy':
         return styles.easy;
-
       case 'Medium':
         return styles.medium;
-
       case 'Hard':
         return styles.hard;
-
       default:
         return '';
     }
   }
 
-  public render(): React.ReactElement<ISolutionsProps> {
+  private clearFilters = (): void => {
+    this.setState({
+      search: '',
+      technology: '',
+      category: '',
+      difficulty: ''
+    });
+  };
 
+  public render(): React.ReactElement<ISolutionsProps> {
     const {
       loading,
       error,
@@ -184,8 +165,7 @@ export default class Solutions
       difficulty
     } = this.state;
 
-    const filtered =
-      this.getFilteredSolutions();
+    const filtered = this.getFilteredSolutions();
 
     const technologies = [
       'React',
@@ -211,378 +191,233 @@ export default class Solutions
       'Performance'
     ];
 
-    const difficulties = [
-      'Easy',
-      'Medium',
-      'Hard'
+    const difficulties = ['Easy', 'Medium', 'Hard'];
+
+    const technologyOptions: IDropdownOption[] = [
+      { key: '', text: 'All Technologies' },
+      ...technologies.map(item => ({ key: item, text: item }))
     ];
 
+    const categoryOptions: IDropdownOption[] = [
+      { key: '', text: 'All Categories' },
+      ...categories.map(item => ({ key: item, text: item }))
+    ];
+
+    const difficultyOptions: IDropdownOption[] = [
+      { key: '', text: 'All Difficulties' },
+      ...difficulties.map(item => ({ key: item, text: item }))
+    ];
+
+    const hasActiveFilters = Boolean(
+      search || technology || category || difficulty
+    );
+
     return (
-
       <section className={styles.solutionsPage}>
-
         {/* HEADER */}
-
         <div className={styles.header}>
-
-          <button
+          <DefaultButton
             className={styles.backButton}
+            text="Back to Home"
+            iconProps={{ iconName: 'Back' }}
             onClick={this.props.onBack}
-          >
-            <ArrowLeft size={18} />
-
-            Back to Home
-          </button>
+          />
 
           <div>
-
-            <h1>
-              All Solutions
-            </h1>
-
+            <h1>All Solutions</h1>
             <p>
-              Browse solutions shared by your
-              development team.
+              Browse solutions shared by your development team.
             </p>
-
           </div>
-
         </div>
 
         {/* FILTERS */}
-
         <div className={styles.filterCard}>
-
           <div className={styles.searchBox}>
-
-            <Search size={18} />
-
-            <input
-              type="text"
+            <TextField
+              className={styles.searchField}
               placeholder="Search problems, errors, technologies..."
               value={search}
-              onChange={event =>
-                this.setState({
-                  search:
-                    event.target.value
-                })
+              onChange={(_, value) =>
+                this.setState({ search: value || '' })
               }
+              ariaLabel="Search solutions"
             />
-
           </div>
 
           <div className={styles.filterTitle}>
-
-            <SlidersHorizontal size={16} />
-
             Filters
-
           </div>
 
-          <select
-            value={technology}
-            onChange={event =>
+          <Dropdown
+            className={styles.filterDropdown}
+            placeholder="All Technologies"
+            ariaLabel="Filter by technology"
+            options={technologyOptions}
+            selectedKey={technology}
+            onChange={(_, option) =>
               this.setState({
-                technology:
-                  event.target.value
+                technology: option ? String(option.key) : ''
               })
             }
-          >
+          />
 
-            <option value="">
-              All Technologies
-            </option>
-
-            {technologies.map(item => (
-
-              <option
-                key={item}
-                value={item}
-              >
-                {item}
-              </option>
-
-            ))}
-
-          </select>
-
-          <select
-            value={category}
-            onChange={event =>
+          <Dropdown
+            className={styles.filterDropdown}
+            placeholder="All Categories"
+            ariaLabel="Filter by category"
+            options={categoryOptions}
+            selectedKey={category}
+            onChange={(_, option) =>
               this.setState({
-                category:
-                  event.target.value
+                category: option ? String(option.key) : ''
               })
             }
-          >
+          />
 
-            <option value="">
-              All Categories
-            </option>
-
-            {categories.map(item => (
-
-              <option
-                key={item}
-                value={item}
-              >
-                {item}
-              </option>
-
-            ))}
-
-          </select>
-
-          <select
-            value={difficulty}
-            onChange={event =>
+          <Dropdown
+            className={styles.filterDropdown}
+            placeholder="All Difficulties"
+            ariaLabel="Filter by difficulty"
+            options={difficultyOptions}
+            selectedKey={difficulty}
+            onChange={(_, option) =>
               this.setState({
-                difficulty:
-                  event.target.value
+                difficulty: option ? String(option.key) : ''
               })
             }
-          >
+          />
 
-            <option value="">
-              All Difficulties
-            </option>
-
-            {difficulties.map(item => (
-
-              <option
-                key={item}
-                value={item}
-              >
-                {item}
-              </option>
-
-            ))}
-
-          </select>
-
-          <button
-            type="button"
+          <DefaultButton
             className={styles.clearFilters}
-            disabled={
-              !search &&
-              !technology &&
-              !category &&
-              !difficulty
-            }
-            onClick={() =>
-              this.setState({
-                search: '',
-                technology: '',
-                category: '',
-                difficulty: ''
-              })
-            }
-          >
-            ✕ Clear Filters
-          </button>
-
+            text="Clear Filters"
+            iconProps={{ iconName: 'ClearFilter' }}
+            disabled={!hasActiveFilters}
+            onClick={this.clearFilters}
+          />
         </div>
 
-        {/* CONTENT */}
-
+        {/* LOADING */}
         {loading && (
-
           <div className={styles.message}>
-            Loading solutions...
+            <Spinner
+              size={SpinnerSize.medium}
+              label="Loading solutions..."
+            />
           </div>
-
         )}
 
-        {error && (
-
+        {/* ERROR */}
+        {!loading && error && (
           <div className={styles.message}>
-            {error}
+            <MessageBar messageBarType={MessageBarType.error}>
+              {error}
+            </MessageBar>
           </div>
-
         )}
 
+        {/* SOLUTIONS */}
         {!loading && !error && (
-
           <>
-
             <div className={styles.resultInfo}>
-
-              <strong>
-                {filtered.length}
-              </strong>
-
+              <strong>{filtered.length}</strong>
               {' '}solutions found
-
             </div>
 
             {filtered.length > 0 ? (
-
               <div className={styles.solutionGrid}>
-
                 {filtered.map(solution => (
-
                   <article
                     key={solution.Id}
                     className={styles.solutionCard}
                   >
-
                     {/* TOP */}
-
                     <div className={styles.cardTop}>
-
-                      <div
-                        className={
-                          styles.cardBadges
-                        }
-                      >
-
-                        <span
-                          className={
-                            styles.techBadge
-                          }
-                        >
+                      <div className={styles.cardBadges}>
+                        <span className={styles.techBadge}>
                           {solution.Technology}
                         </span>
 
-                        <span
-                          className={
-                            styles.categoryBadge
-                          }
-                        >
+                        <span className={styles.categoryBadge}>
                           {solution.Category}
                         </span>
 
                         <span
-                          className={
-                            this.getDifficultyClass(
-                              solution.Difficulty
-                            )
-                          }
+                          className={this.getDifficultyClass(
+                            solution.Difficulty
+                          )}
                         >
                           {solution.Difficulty}
                         </span>
-
                       </div>
 
-                      <button
-                        type="button"
-                        className={
-                          styles.favoriteButton
-                        }
-                        aria-label="Add to favorites"
-                        onClick={event =>
-                          event.stopPropagation()
-                        }
-                      >
-                        <Star size={16} />
-                      </button>
-
+                      <IconButton
+                        className={styles.favoriteButton}
+                        iconProps={{
+                          iconName: solution.IsFavorite
+                            ? 'FavoriteStarFill'
+                            : 'FavoriteStar'
+                        }}
+                        title="Favorites"
+                        ariaLabel="Favorites"
+                        onClick={event => event?.stopPropagation()}
+                      />
                     </div>
 
                     {/* TITLE */}
-
-                    <h3>
-                      {solution.Title}
-                    </h3>
+                    <h3>{solution.Title}</h3>
 
                     {/* PROBLEM */}
-
-                    <p>
-                      {solution.Problem}
-                    </p>
+                    <p>{solution.Problem}</p>
 
                     {/* TAGS */}
-
-                    <div
-                      className={
-                        styles.tags
-                      }
-                    >
-
+                    <div className={styles.tags}>
                       {(solution.Tags || '')
                         .split(',')
-                        .map(tag =>
-                          tag.trim()
-                        )
+                        .map(tag => tag.trim())
                         .filter(Boolean)
                         .slice(0, 3)
                         .map(tag => (
-
                           <span
                             key={tag}
-                            className={
-                              styles.tag
-                            }
+                            className={styles.tag}
                           >
                             #{tag}
                           </span>
-
                         ))}
-
                     </div>
 
                     {/* ACTIONS */}
+                    <div className={styles.cardActions}>
+                      <DefaultButton
+                        className={styles.helpfulButton}
+                        text={`Helpful · ${solution.HelpfulCount}`}
+                        iconProps={{ iconName: 'Like' }}
+                        onClick={event => event?.stopPropagation()}
+                      />
 
-                    <div
-                      className={
-                        styles.cardActions
-                      }
-                    >
-
-                      <button
-                        type="button"
-                        className={
-                          styles.helpfulButton
-                        }
-                        onClick={event =>
-                          event.stopPropagation()
-                        }
-                      >
-
-                        <ThumbsUp size={14} />
-
-                        Helpful ·{' '}
-                        {solution.HelpfulCount}
-
-                      </button>
-
-                      <button
-  type="button"
-  className={styles.viewSolutionButton}
-  onClick={event => {
-    event.stopPropagation();
-    this.props.onViewSolution(solution.Id);
-  }}
->
-  View Solution
-  <ArrowRight size={15} />
-</button>
-
+                      <PrimaryButton
+                        className={styles.viewSolutionButton}
+                        text="View Solution"
+                        iconProps={{ iconName: 'Forward' }}
+                        onClick={event => {
+                          event?.stopPropagation();
+                          this.props.onViewSolution(solution.Id);
+                        }}
+                      />
                     </div>
-
                   </article>
-
                 ))}
-
               </div>
-
             ) : (
-
-              <div
-                className={
-                  styles.emptyState
-                }
-              >
+              <div className={styles.emptyState}>
                 No solutions found.
               </div>
-
             )}
-
           </>
-
         )}
-
       </section>
     );
   }
 }
+

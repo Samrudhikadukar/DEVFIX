@@ -364,4 +364,39 @@ public async updateSolutionStatus(
       Status: status
     });
 }
+
+public async getFavoriteSolutions(userId: number): Promise<any[]> {
+  const favoriteItems = await this.sp.web.lists
+    .getByTitle("DevFixFavorites")
+    .items
+    .select("Id", "SolutionId", "UserId")
+    .filter(`UserId eq ${userId}`)
+    .top(5000)();
+
+  const favoriteIds = favoriteItems.map(
+    (item: any) => Number(item.SolutionId)
+  );
+
+  if (favoriteIds.length === 0) {
+    return [];
+  }
+
+  const allSolutions = await this.getSolutions();
+
+  const favoriteSolutions = allSolutions.filter(
+    (solution: any) => {
+      const solutionId = Number(solution.Id);
+
+      return (
+        favoriteIds.indexOf(solutionId) !== -1 &&
+        solution.Status === "Published"
+      );
+    }
+  );
+
+  return favoriteSolutions.map((solution: any) => ({
+    ...solution,
+    IsFavorite: true
+  }));
+}
 }

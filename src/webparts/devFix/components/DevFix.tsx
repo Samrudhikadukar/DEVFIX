@@ -11,11 +11,10 @@ import DevFixNavbar from './DevFixNavbar';
 import Solutions from './Solutions';
 import SolutionDetails from './SolutionDetails';
 import MyContributions from './MyContributions';
-import AddSolutionForm, {
-  IAddSolutionInput
-} from './AddSolutionForm';
+import AddSolutionForm, { IAddSolutionInput } from './AddSolutionForm';
 import AdminDashboard from './AdminDashboard';
 import ManageUsers from './ManageUsers';
+import Favorites from './Favorites';
 
 import {
   BookOpen,
@@ -42,7 +41,6 @@ interface ISolution {
   IsFavorite: boolean;
   Status: string;
   Created: string;
-
   Author?: {
     Id: number;
     Title: string;
@@ -67,16 +65,15 @@ interface IDevFixState {
   technology: string;
   category: string;
   difficulty: string;
-
   page:
     | 'home'
     | 'solutions'
+    | 'favorites'
     | 'details'
     | 'my-contributions'
     | 'add-solution'
     | 'admin'
     | 'manage-users';
-
   selectedSolutionId: number | null;
   isAdminViewingSolution: boolean;
 }
@@ -105,22 +102,16 @@ export default class DevFix extends React.Component<
   constructor(props: IDevFixProps) {
     super(props);
 
-    this.sharePointService = new SharePointService(
-      props.context
-    );
-
-    this.userService = new UserService(
-      props.context
-    );
+    this.sharePointService = new SharePointService(props.context);
+    this.userService = new UserService(props.context);
   }
 
   public async componentDidMount(): Promise<void> {
     try {
-      const [solutions, currentUser] =
-        await Promise.all([
-          this.sharePointService.getSolutions(),
-          this.userService.getCurrentUser()
-        ]);
+      const [solutions, currentUser] = await Promise.all([
+        this.sharePointService.getSolutions(),
+        this.userService.getCurrentUser()
+      ]);
 
       this.setState({
         solutions: solutions as ISolution[],
@@ -128,10 +119,7 @@ export default class DevFix extends React.Component<
         loading: false
       });
     } catch (error) {
-      console.error(
-        'Error loading DevFix:',
-        error
-      );
+      console.error('Error loading DevFix:', error);
 
       this.setState({
         loading: false,
@@ -140,38 +128,22 @@ export default class DevFix extends React.Component<
     }
   }
 
-  /*
-   * ==========================================
-   * REFRESH SOLUTIONS
-   * ==========================================
-   */
-
   private refreshSolutions = async (): Promise<void> => {
     try {
-      const solutions =
-        await this.sharePointService.getSolutions();
+      const solutions = await this.sharePointService.getSolutions();
 
       this.setState({
         solutions: solutions as ISolution[],
         error: ''
       });
     } catch (error) {
-      console.error(
-        'Error refreshing solutions:',
-        error
-      );
+      console.error('Error refreshing solutions:', error);
 
       this.setState({
         error: 'Unable to refresh solutions.'
       });
     }
   };
-
-  /*
-   * ==========================================
-   * NAVIGATION
-   * ==========================================
-   */
 
   private handleHome = (): void => {
     this.setState({
@@ -189,6 +161,14 @@ export default class DevFix extends React.Component<
     });
   };
 
+  private handleFavorites = (): void => {
+    this.setState({
+      page: 'favorites',
+      selectedSolutionId: null,
+      isAdminViewingSolution: false
+    });
+  };
+
   private handleMyContributions = (): void => {
     this.setState({
       page: 'my-contributions',
@@ -198,13 +178,7 @@ export default class DevFix extends React.Component<
   };
 
   private handleAdmin = (): void => {
-    /*
-     * Admin page should only be accessible
-     * to ADMIN users.
-     */
-    if (
-      this.state.currentUser?.role !== 'ADMIN'
-    ) {
+    if (this.state.currentUser?.role !== 'ADMIN') {
       return;
     }
 
@@ -215,20 +189,8 @@ export default class DevFix extends React.Component<
     });
   };
 
-  /*
-   * ==========================================
-   * MANAGE USERS
-   * ==========================================
-   */
-
   private handleManageUsers = (): void => {
-    /*
-     * Manage Users should only be accessible
-     * to ADMIN users.
-     */
-    if (
-      this.state.currentUser?.role !== 'ADMIN'
-    ) {
+    if (this.state.currentUser?.role !== 'ADMIN') {
       return;
     }
 
@@ -238,12 +200,6 @@ export default class DevFix extends React.Component<
       isAdminViewingSolution: false
     });
   };
-
-  /*
-   * ==========================================
-   * ADD / EDIT SOLUTION
-   * ==========================================
-   */
 
   private handleAddSolution = (): void => {
     this.setState({
@@ -257,15 +213,7 @@ export default class DevFix extends React.Component<
     input: IAddSolutionInput
   ): Promise<void> => {
     try {
-      /*
-       * ======================================
-       * EDIT EXISTING SOLUTION
-       * ======================================
-       */
-
-      if (
-        this.state.selectedSolutionId !== null
-      ) {
+      if (this.state.selectedSolutionId !== null) {
         await this.sharePointService.updateSolution(
           this.state.selectedSolutionId,
           input
@@ -283,12 +231,6 @@ export default class DevFix extends React.Component<
         return;
       }
 
-      /*
-       * ======================================
-       * ADD NEW SOLUTION
-       * ======================================
-       */
-
       await this.sharePointService.addSolution({
         ...input,
         status: 'Pending Review'
@@ -303,10 +245,7 @@ export default class DevFix extends React.Component<
         error: ''
       });
     } catch (error) {
-      console.error(
-        'Error saving solution:',
-        error
-      );
+      console.error('Error saving solution:', error);
 
       this.setState({
         error: 'Unable to save the solution.'
@@ -316,15 +255,7 @@ export default class DevFix extends React.Component<
     }
   };
 
-  /*
-   * ==========================================
-   * ADMIN ACTIONS
-   * ==========================================
-   */
-
-  private handleAdminViewSolution = (
-    id: number
-  ): void => {
+  private handleAdminViewSolution = (id: number): void => {
     this.setState({
       page: 'details',
       selectedSolutionId: id,
@@ -332,9 +263,7 @@ export default class DevFix extends React.Component<
     });
   };
 
-  private handleAdminEditSolution = (
-    id: number
-  ): void => {
+  private handleAdminEditSolution = (id: number): void => {
     this.setState({
       page: 'add-solution',
       selectedSolutionId: id,
@@ -342,69 +271,39 @@ export default class DevFix extends React.Component<
     });
   };
 
-  private handleAdminDataChanged =
-    async (): Promise<void> => {
-      await this.refreshSolutions();
-    };
-
-  /*
-   * ==========================================
-   * SOLUTION DATA HELPERS
-   * ==========================================
-   */
+  private handleAdminDataChanged = async (): Promise<void> => {
+    await this.refreshSolutions();
+  };
 
   private getPublishedSolutions(): ISolution[] {
     return this.state.solutions.filter(
-      solution =>
-        solution.Status === 'Published'
+      solution => solution.Status === 'Published'
     );
   }
 
   private getFilteredSolutions(): ISolution[] {
-    const published =
-      this.getPublishedSolutions();
-
-    const search =
-      this.state.search
-        .trim()
-        .toLowerCase();
-
-    const technology =
-      this.state.technology;
-
-    const category =
-      this.state.category;
-
-    const difficulty =
-      this.state.difficulty;
+    const published = this.getPublishedSolutions();
+    const search = this.state.search.trim().toLowerCase();
+    const technology = this.state.technology;
+    const category = this.state.category;
+    const difficulty = this.state.difficulty;
 
     return published.filter(solution => {
       const matchesSearch =
         !search ||
-        solution.Title
-          .toLowerCase()
-          .includes(search) ||
-        solution.Technology
-          .toLowerCase()
-          .includes(search) ||
-        solution.Category
-          .toLowerCase()
-          .includes(search) ||
-        solution.Problem
-          .toLowerCase()
-          .includes(search);
+        solution.Title.toLowerCase().includes(search) ||
+        solution.Technology.toLowerCase().includes(search) ||
+        solution.Category.toLowerCase().includes(search) ||
+        solution.Problem.toLowerCase().includes(search);
 
       const matchesTechnology =
-        !technology ||
-        solution.Technology === technology;
+        !technology || solution.Technology === technology;
 
       const matchesCategory =
-        !category ||
-        solution.Category === category;
+        !category || solution.Category === category;
 
       const matchesDifficulty =
-        !difficulty ||
-        solution.Difficulty === difficulty;
+        !difficulty || solution.Difficulty === difficulty;
 
       return (
         matchesSearch &&
@@ -415,49 +314,32 @@ export default class DevFix extends React.Component<
     });
   }
 
-  private getDifficultyClass(
-    difficulty: string
-  ): string {
+  private getDifficultyClass(difficulty: string): string {
     switch (difficulty) {
       case 'Easy':
         return styles.easy;
-
       case 'Medium':
         return styles.medium;
-
       case 'Hard':
         return styles.hard;
-
       default:
         return '';
     }
   }
 
   private formatDate(date: string): string {
-    return new Date(date).toLocaleDateString(
-      'en-IN',
-      {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-      }
-    );
+    return new Date(date).toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
   }
 
-  private getTechnologyCount(
-    technology: string
-  ): number {
+  private getTechnologyCount(technology: string): number {
     return this.getPublishedSolutions().filter(
-      solution =>
-        solution.Technology === technology
+      solution => solution.Technology === technology
     ).length;
   }
-
-  /*
-   * ==========================================
-   * RENDER
-   * ==========================================
-   */
 
   public render(): React.ReactElement<IDevFixProps> {
     const {
@@ -495,24 +377,13 @@ export default class DevFix extends React.Component<
       'Performance'
     ];
 
-    const difficulties = [
-      'Easy',
-      'Medium',
-      'Hard'
-    ];
+    const difficulties = ['Easy', 'Medium', 'Hard'];
 
-    const filtered =
-      this.getFilteredSolutions();
-
-    const published =
-      this.getPublishedSolutions();
+    const filtered = this.getFilteredSolutions();
+    const published = this.getPublishedSolutions();
 
     const mostHelpful = [...published]
-      .sort(
-        (a, b) =>
-          b.HelpfulCount -
-          a.HelpfulCount
-      )
+      .sort((a, b) => b.HelpfulCount - a.HelpfulCount)
       .slice(0, 5);
 
     const recent = [...published]
@@ -523,20 +394,11 @@ export default class DevFix extends React.Component<
       )
       .slice(0, 5);
 
-    const myContributions =
-      currentUser
-        ? this.state.solutions.filter(
-            solution =>
-              solution.Author?.Id ===
-              currentUser.id
-          ).length
-        : 0;
-
-    /*
-     * ==========================================
-     * SOLUTION DETAILS PAGE
-     * ==========================================
-     */
+    const myContributions = currentUser
+      ? this.state.solutions.filter(
+          solution => solution.Author?.Id === currentUser.id
+        ).length
+      : 0;
 
     if (
       page === 'details' &&
@@ -544,48 +406,34 @@ export default class DevFix extends React.Component<
     ) {
       return (
         <div className={styles.devFix}>
-
           {currentUser && (
             <DevFixNavbar
               currentUser={currentUser}
               onHome={this.handleHome}
               onSolutions={this.handleSolutions}
-              onMyContributions={
-                this.handleMyContributions
-              }
-              onAddSolution={
-                this.handleAddSolution
-              }
+              onFavorites={this.handleFavorites}
+              onMyContributions={this.handleMyContributions}
+              onAddSolution={this.handleAddSolution}
               onAdmin={this.handleAdmin}
             />
           )}
 
           <SolutionDetails
             context={this.props.context}
-            solutionId={
-              this.state.selectedSolutionId
-            }
+            solutionId={this.state.selectedSolutionId}
             onBack={() =>
               this.setState({
-                page:
-                  this.state.isAdminViewingSolution
-                    ? 'admin'
-                    : 'solutions',
+                page: this.state.isAdminViewingSolution
+                  ? 'admin'
+                  : 'solutions',
                 selectedSolutionId: null,
                 isAdminViewingSolution: false
               })
             }
           />
-
         </div>
       );
     }
-
-    /*
-     * ==========================================
-     * MANAGE USERS PAGE
-     * ==========================================
-     */
 
     if (
       page === 'manage-users' &&
@@ -593,17 +441,13 @@ export default class DevFix extends React.Component<
     ) {
       return (
         <div className={styles.devFix}>
-
           <DevFixNavbar
             currentUser={currentUser}
             onHome={this.handleHome}
             onSolutions={this.handleSolutions}
-            onMyContributions={
-              this.handleMyContributions
-            }
-            onAddSolution={
-              this.handleAddSolution
-            }
+            onFavorites={this.handleFavorites}
+            onMyContributions={this.handleMyContributions}
+            onAddSolution={this.handleAddSolution}
             onAdmin={this.handleAdmin}
           />
 
@@ -612,34 +456,49 @@ export default class DevFix extends React.Component<
             solutions={this.state.solutions}
             onBack={this.handleAdmin}
           />
-
         </div>
       );
     }
 
-    /*
-     * ==========================================
-     * ADMIN DASHBOARD PAGE
-     * ==========================================
-     */
-
-    if (
-      page === 'admin' &&
-      currentUser?.role === 'ADMIN'
-    ) {
+    if (page === 'favorites' && currentUser) {
       return (
         <div className={styles.devFix}>
-
           <DevFixNavbar
             currentUser={currentUser}
             onHome={this.handleHome}
             onSolutions={this.handleSolutions}
-            onMyContributions={
-              this.handleMyContributions
-            }
-            onAddSolution={
-              this.handleAddSolution
-            }
+            onFavorites={this.handleFavorites}
+            onMyContributions={this.handleMyContributions}
+            onAddSolution={this.handleAddSolution}
+            onAdmin={this.handleAdmin}
+          />
+
+          <Favorites
+            sharePointService={this.sharePointService}
+            currentUser={currentUser}
+            onViewSolution={(id: number) => {
+              this.setState({
+                page: 'details',
+                selectedSolutionId: id,
+                isAdminViewingSolution: false
+              });
+            }}
+            onBack={this.handleSolutions}
+          />
+        </div>
+      );
+    }
+
+    if (page === 'admin' && currentUser?.role === 'ADMIN') {
+      return (
+        <div className={styles.devFix}>
+          <DevFixNavbar
+            currentUser={currentUser}
+            onHome={this.handleHome}
+            onSolutions={this.handleSolutions}
+            onFavorites={this.handleFavorites}
+            onMyContributions={this.handleMyContributions}
+            onAddSolution={this.handleAddSolution}
             onAdmin={this.handleAdmin}
           />
 
@@ -647,136 +506,86 @@ export default class DevFix extends React.Component<
             solutions={this.state.solutions}
             currentUser={currentUser}
             context={this.props.context}
-            onViewSolution={
-              this.handleAdminViewSolution
-            }
-            onEditSolution={
-              this.handleAdminEditSolution
-            }
-            onDataChanged={
-              this.handleAdminDataChanged
-            }
-            onAllSolutions={
-              this.handleSolutions
-            }
-            onManageUsers={
-              this.handleManageUsers
-            }
+            onViewSolution={this.handleAdminViewSolution}
+            onEditSolution={this.handleAdminEditSolution}
+            onDataChanged={this.handleAdminDataChanged}
+            onAllSolutions={this.handleSolutions}
+            onManageUsers={this.handleManageUsers}
           />
-
         </div>
       );
     }
 
-    /*
-     * ==========================================
-     * ADD / EDIT SOLUTION PAGE
-     * ==========================================
-     */
-
     if (page === 'add-solution') {
-
       const selectedSolution =
         this.state.selectedSolutionId !== null
           ? this.state.solutions.find(
               solution =>
-                solution.Id ===
-                this.state.selectedSolutionId
+                solution.Id === this.state.selectedSolutionId
             )
           : undefined;
 
-      const editSolution:
-        | IAddSolutionInput
-        | undefined =
+      const editSolution: IAddSolutionInput | undefined =
         selectedSolution
           ? {
-              title:
-                selectedSolution.Title || '',
-              technology:
-                selectedSolution.Technology || '',
-              category:
-                selectedSolution.Category || '',
-              difficulty:
-                selectedSolution.Difficulty || '',
-              problem:
-                selectedSolution.Problem || '',
-              errorMessage:
-                selectedSolution.ErrorMessage || '',
-              cause:
-                selectedSolution.Cause || '',
-              solution:
-                selectedSolution.Solution || '',
-              lessonLearned:
-                selectedSolution.LessonLearned || '',
-              tags:
-                selectedSolution.Tags || ''
+              title: selectedSolution.Title || '',
+              technology: selectedSolution.Technology || '',
+              category: selectedSolution.Category || '',
+              difficulty: selectedSolution.Difficulty || '',
+              problem: selectedSolution.Problem || '',
+              errorMessage: selectedSolution.ErrorMessage || '',
+              cause: selectedSolution.Cause || '',
+              solution: selectedSolution.Solution || '',
+              lessonLearned: selectedSolution.LessonLearned || '',
+              tags: selectedSolution.Tags || ''
             }
           : undefined;
 
       return (
         <div className={styles.devFix}>
-
           {currentUser && (
             <DevFixNavbar
               currentUser={currentUser}
               onHome={this.handleHome}
               onSolutions={this.handleSolutions}
-              onMyContributions={
-                this.handleMyContributions
-              }
-              onAddSolution={
-                this.handleAddSolution
-              }
+              onFavorites={this.handleFavorites}
+              onMyContributions={this.handleMyContributions}
+              onAddSolution={this.handleAddSolution}
               onAdmin={this.handleAdmin}
             />
           )}
 
-         <AddSolutionForm
-  context={this.props.context}
-  initialSolution={editSolution}
-  isEditMode={
-    this.state.selectedSolutionId !== null
-  }
-  onCancel={() =>
-    this.setState({
-      page:
-        this.state.selectedSolutionId !== null
-          ? 'admin'
-          : 'my-contributions',
-      selectedSolutionId: null,
-      isAdminViewingSolution: false
-    })
-  }
-  onSubmit={
-    this.handleAddSolutionSubmit
-  }
-/>
-
+          <AddSolutionForm
+            context={this.props.context}
+            initialSolution={editSolution}
+            isEditMode={this.state.selectedSolutionId !== null}
+            onCancel={() =>
+              this.setState({
+                page:
+                  this.state.selectedSolutionId !== null
+                    ? 'admin'
+                    : 'my-contributions',
+                selectedSolutionId: null,
+                isAdminViewingSolution: false
+              })
+            }
+            onSubmit={this.handleAddSolutionSubmit}
+          />
         </div>
       );
     }
 
-    /*
-     * ==========================================
-     * MY CONTRIBUTIONS PAGE
-     * ==========================================
-     */
-
     if (page === 'my-contributions') {
       return (
         <div className={styles.devFix}>
-
           {currentUser && (
             <DevFixNavbar
               currentUser={currentUser}
               onHome={this.handleHome}
               onSolutions={this.handleSolutions}
-              onMyContributions={
-                this.handleMyContributions
-              }
-              onAddSolution={
-                this.handleAddSolution
-              }
+              onFavorites={this.handleFavorites}
+              onMyContributions={this.handleMyContributions}
+              onAddSolution={this.handleAddSolution}
               onAdmin={this.handleAdmin}
             />
           )}
@@ -784,9 +593,7 @@ export default class DevFix extends React.Component<
           <MyContributions
             context={this.props.context}
             onBack={this.handleHome}
-            onAddSolution={
-              this.handleAddSolution
-            }
+            onAddSolution={this.handleAddSolution}
             onViewSolution={(id: number) =>
               this.setState({
                 page: 'details',
@@ -795,32 +602,21 @@ export default class DevFix extends React.Component<
               })
             }
           />
-
         </div>
       );
     }
 
-    /*
-     * ==========================================
-     * ALL SOLUTIONS PAGE
-     * ==========================================
-     */
-
     if (page === 'solutions') {
       return (
         <div className={styles.devFix}>
-
           {currentUser && (
             <DevFixNavbar
               currentUser={currentUser}
               onHome={this.handleHome}
               onSolutions={this.handleSolutions}
-              onMyContributions={
-                this.handleMyContributions
-              }
-              onAddSolution={
-                this.handleAddSolution
-              }
+              onFavorites={this.handleFavorites}
+              onMyContributions={this.handleMyContributions}
+              onAddSolution={this.handleAddSolution}
               onAdmin={this.handleAdmin}
             />
           )}
@@ -836,182 +632,103 @@ export default class DevFix extends React.Component<
               })
             }
           />
-
         </div>
       );
     }
 
-    /*
-     * ==========================================
-     * HOME PAGE
-     * ==========================================
-     */
-
     return (
       <div className={styles.devFix}>
-
         {currentUser && (
           <DevFixNavbar
             currentUser={currentUser}
             onHome={this.handleHome}
             onSolutions={this.handleSolutions}
-            onMyContributions={
-              this.handleMyContributions
-            }
-            onAddSolution={
-              this.handleAddSolution
-            }
+            onFavorites={this.handleFavorites}
+            onMyContributions={this.handleMyContributions}
+            onAddSolution={this.handleAddSolution}
             onAdmin={this.handleAdmin}
           />
         )}
 
-        {/* HERO */}
-
         <section className={styles.hero}>
-
           <div className={styles.heroContent}>
-
             <span className={styles.heroBadge}>
               <Sparkles size={14} />
               Developer Problem Solver
             </span>
 
             <h1>
-              <span>Solve.</span>{' '}
-              Learn. Share.
+              <span>Solve.</span> Learn. Share.
             </h1>
 
             <p>
-              Find solutions to common
-              development problems and
-              share what you've learned
-              with your team.
+              Find solutions to common development problems and
+              share what you've learned with your team.
             </p>
 
-            {/* SEARCH */}
-
-            <div
-              className={
-                styles.searchContainer
-              }
-            >
-
-              <div
-                className={
-                  styles.searchInputWrapper
-                }
-              >
-
-                <span
-                  className={
-                    styles.searchIcon
-                  }
-                >
-                  🔍
-                </span>
+            <div className={styles.searchContainer}>
+              <div className={styles.searchInputWrapper}>
+                <span className={styles.searchIcon}>🔍</span>
 
                 <input
                   type="text"
                   placeholder="Search problems, errors, technologies..."
                   value={search}
                   onChange={event =>
-                    this.setState({
-                      search:
-                        event.target.value
-                    })
+                    this.setState({ search: event.target.value })
                   }
                 />
-
               </div>
 
-              {/* FILTERS */}
-
-              <div
-                className={
-                  styles.filterBar
-                }
-              >
-
+              <div className={styles.filterBar}>
                 <select
                   value={technology}
                   onChange={event =>
-                    this.setState({
-                      technology:
-                        event.target.value
-                    })
+                    this.setState({ technology: event.target.value })
                   }
                   aria-label="Technology"
                 >
-                  <option value="">
-                    All Technologies
-                  </option>
-
+                  <option value="">All Technologies</option>
                   {technologies.map(item => (
-                    <option
-                      key={item}
-                      value={item}
-                    >
+                    <option key={item} value={item}>
                       {item}
                     </option>
                   ))}
-
                 </select>
 
                 <select
                   value={category}
                   onChange={event =>
-                    this.setState({
-                      category:
-                        event.target.value
-                    })
+                    this.setState({ category: event.target.value })
                   }
                   aria-label="Category"
                 >
-                  <option value="">
-                    All Categories
-                  </option>
-
+                  <option value="">All Categories</option>
                   {categories.map(item => (
-                    <option
-                      key={item}
-                      value={item}
-                    >
+                    <option key={item} value={item}>
                       {item}
                     </option>
                   ))}
-
                 </select>
 
                 <select
                   value={difficulty}
                   onChange={event =>
-                    this.setState({
-                      difficulty:
-                        event.target.value
-                    })
+                    this.setState({ difficulty: event.target.value })
                   }
                   aria-label="Difficulty"
                 >
-                  <option value="">
-                    All Difficulties
-                  </option>
-
+                  <option value="">All Difficulties</option>
                   {difficulties.map(item => (
-                    <option
-                      key={item}
-                      value={item}
-                    >
+                    <option key={item} value={item}>
                       {item}
                     </option>
                   ))}
-
                 </select>
 
                 <button
                   type="button"
-                  className={
-                    styles.clearFilters
-                  }
+                  className={styles.clearFilters}
                   disabled={
                     !search &&
                     !technology &&
@@ -1029,180 +746,78 @@ export default class DevFix extends React.Component<
                 >
                   ✕ Clear Filters
                 </button>
-
               </div>
-
             </div>
-
           </div>
-
         </section>
 
-        {/* MAIN */}
-
-        <main
-          className={
-            styles.mainContainer
-          }
-        >
-
-          {/* STATS */}
-
-          <section
-            className={
-              styles.statsGrid
-            }
-          >
-
-            <div
-              className={
-                styles.statCard
-              }
-            >
+        <main className={styles.mainContainer}>
+          <section className={styles.statsGrid}>
+            <div className={styles.statCard}>
               <BookOpen />
-
               <div>
-                <span>
-                  Total Solutions
-                </span>
-
-                <strong>
-                  {published.length}
-                </strong>
+                <span>Total Solutions</span>
+                <strong>{published.length}</strong>
               </div>
-
             </div>
 
-            <div
-              className={
-                styles.statCard
-              }
-            >
+            <div className={styles.statCard}>
               <Layers />
-
               <div>
-                <span>
-                  Technologies
-                </span>
-
-                <strong>
-                  {technologies.length}
-                </strong>
+                <span>Technologies</span>
+                <strong>{technologies.length}</strong>
               </div>
-
             </div>
 
-            <div
-              className={
-                styles.statCard
-              }
-            >
+            <div className={styles.statCard}>
               <ThumbsUp />
-
               <div>
-                <span>
-                  Helpful Solutions
-                </span>
-
+                <span>Helpful Solutions</span>
                 <strong>
                   {
                     published.filter(
-                      solution =>
-                        solution.HelpfulCount >
-                        0
+                      solution => solution.HelpfulCount > 0
                     ).length
                   }
                 </strong>
               </div>
-
             </div>
 
-            <div
-              className={
-                styles.statCard
-              }
-            >
+            <div className={styles.statCard}>
               <User />
-
               <div>
-                <span>
-                  My Contributions
-                </span>
-
-                <strong>
-                  {myContributions}
-                </strong>
+                <span>My Contributions</span>
+                <strong>{myContributions}</strong>
               </div>
-
             </div>
-
           </section>
 
-          {/* ERROR */}
-
           {error && (
-            <div
-              className={
-                styles.message
-              }
-            >
-              {error}
-            </div>
+            <div className={styles.message}>{error}</div>
           )}
 
-          {/* LOADING */}
-
           {loading && (
-            <div
-              className={
-                styles.message
-              }
-            >
+            <div className={styles.message}>
               Loading solutions...
             </div>
           )}
 
-          {/* FEATURED */}
-
           {!loading && !error && (
             <>
-
-              <section
-                className={
-                  styles.section
-                }
-              >
-
-                <div
-                  className={
-                    styles.sectionHeader
-                  }
-                >
-
+              <section className={styles.section}>
+                <div className={styles.sectionHeader}>
                   <div>
-
                     <h2>
-                      {
-                        search ||
-                        technology ||
-                        category ||
-                        difficulty
-                          ? `Search Results (${filtered.length})`
-                          : 'Featured Solutions'
-                      }
+                      {search || technology || category || difficulty
+                        ? `Search Results (${filtered.length})`
+                        : 'Featured Solutions'}
                     </h2>
 
                     <p>
-                      {
-                        search ||
-                        technology ||
-                        category ||
-                        difficulty
-                          ? 'Matching your search and filters'
-                          : 'Hand-picked fixes the team keeps coming back to'
-                      }
+                      {search || technology || category || difficulty
+                        ? 'Matching your search and filters'
+                        : 'Hand-picked fixes the team keeps coming back to'}
                     </p>
-
                   </div>
 
                   <button
@@ -1211,78 +826,40 @@ export default class DevFix extends React.Component<
                   >
                     Browse all →
                   </button>
-
                 </div>
 
                 {filtered.length > 0 ? (
-                  <div
-                    className={
-                      styles.solutionGrid
-                    }
-                  >
-
-                    {(search ||
-                    technology ||
-                    category ||
-                    difficulty
+                  <div className={styles.solutionGrid}>
+                    {(search || technology || category || difficulty
                       ? filtered
                       : filtered.slice(0, 6)
                     ).map(solution => (
-
                       <div
                         key={solution.Id}
-                        className={
-                          styles.solutionCard
-                        }
+                        className={styles.solutionCard}
                       >
-
-                        {/* TOP */}
-
-                        <div
-                          className={
-                            styles.cardTop
-                          }
-                        >
-
-                          <div
-                            className={
-                              styles.cardBadges
-                            }
-                          >
-
-                            <span
-                              className={
-                                styles.techBadge
-                              }
-                            >
+                        <div className={styles.cardTop}>
+                          <div className={styles.cardBadges}>
+                            <span className={styles.techBadge}>
                               {solution.Technology}
                             </span>
 
-                            <span
-                              className={
-                                styles.categoryBadge
-                              }
-                            >
+                            <span className={styles.categoryBadge}>
                               {solution.Category}
                             </span>
 
                             <span
-                              className={
-                                this.getDifficultyClass(
-                                  solution.Difficulty
-                                )
-                              }
+                              className={this.getDifficultyClass(
+                                solution.Difficulty
+                              )}
                             >
                               {solution.Difficulty}
                             </span>
-
                           </div>
 
                           <button
                             type="button"
-                            className={
-                              styles.favoriteButton
-                            }
+                            className={styles.favoriteButton}
                             aria-label="Add to favorites"
                             onClick={event =>
                               event.stopPropagation()
@@ -1290,377 +867,173 @@ export default class DevFix extends React.Component<
                           >
                             ⭐
                           </button>
-
                         </div>
 
-                        {/* TITLE */}
+                        <h3>{solution.Title}</h3>
 
-                        <h3>
-                          {solution.Title}
-                        </h3>
+                        <p>{solution.Problem}</p>
 
-                        {/* PROBLEM */}
-
-                        <p>
-                          {solution.Problem}
-                        </p>
-
-                        {/* TAGS */}
-
-                        <div
-                          className={
-                            styles.tags
-                          }
-                        >
-
+                        <div className={styles.tags}>
                           {(solution.Tags || '')
                             .split(',')
-                            .map(tag =>
-                              tag.trim()
-                            )
+                            .map(tag => tag.trim())
                             .filter(Boolean)
                             .slice(0, 3)
                             .map(tag => (
-
-                              <span
-                                key={tag}
-                                className={
-                                  styles.tag
-                                }
-                              >
+                              <span key={tag} className={styles.tag}>
                                 #{tag}
                               </span>
-
                             ))}
-
                         </div>
 
-                        {/* ACTIONS */}
-
-                        <div
-                          className={
-                            styles.cardActions
-                          }
-                        >
-
+                        <div className={styles.cardActions}>
                           <button
                             type="button"
-                            className={
-                              styles.helpfulButton
-                            }
+                            className={styles.helpfulButton}
                             onClick={event =>
                               event.stopPropagation()
                             }
                           >
-                            <ThumbsUp
-                              size={14}
-                            />
-
-                            {
-                              solution.HelpfulCount
-                            }
+                            <ThumbsUp size={14} />
+                            {solution.HelpfulCount}
                           </button>
 
                           <button
                             type="button"
-                            className={
-                              styles.viewSolutionButton
-                            }
+                            className={styles.viewSolutionButton}
                             onClick={event => {
-
                               event.stopPropagation();
 
                               this.setState({
                                 page: 'details',
-                                selectedSolutionId:
-                                  solution.Id,
-                                isAdminViewingSolution:
-                                  false
+                                selectedSolutionId: solution.Id,
+                                isAdminViewingSolution: false
                               });
-
                             }}
                           >
                             View Solution
-
-                            <ArrowRight
-                              size={15}
-                            />
+                            <ArrowRight size={15} />
                           </button>
-
                         </div>
-
                       </div>
-
                     ))}
-
                   </div>
-
                 ) : (
-
-                  <div
-                    className={
-                      styles.emptyState
-                    }
-                  >
+                  <div className={styles.emptyState}>
                     No solutions found.
                   </div>
-
                 )}
-
               </section>
 
-              {/* TECHNOLOGIES */}
-
-              <section
-                className={
-                  styles.section
-                }
-              >
-
-                <div
-                  className={
-                    styles.sectionHeader
-                  }
-                >
-
+              <section className={styles.section}>
+                <div className={styles.sectionHeader}>
                   <div>
-
-                    <h2>
-                      Popular Technologies
-                    </h2>
-
-                    <p>
-                      Jump straight into a stack
-                    </p>
-
+                    <h2>Popular Technologies</h2>
+                    <p>Jump straight into a stack</p>
                   </div>
-
                 </div>
 
-                <div
-                  className={
-                    styles.techGrid
-                  }
-                >
-
+                <div className={styles.techGrid}>
                   {technologies.map(tech => (
-
                     <button
                       key={tech}
                       type="button"
-                      className={
-                        styles.technologyCard
-                      }
+                      className={styles.technologyCard}
                       onClick={() =>
-                        this.setState({
-                          technology: tech
-                        })
+                        this.setState({ technology: tech })
                       }
                     >
-
-                      <div
-                        className={
-                          styles.techIcon
-                        }
-                      >
+                      <div className={styles.techIcon}>
                         <Layers size={20} />
                       </div>
 
-                      <strong>
-                        {tech}
-                      </strong>
+                      <strong>{tech}</strong>
 
                       <span>
-                        {
-                          this.getTechnologyCount(
-                            tech
-                          )
-                        }{' '}
-                        solution
-                        {
-                          this.getTechnologyCount(
-                            tech
-                          ) === 1
-                            ? ''
-                            : 's'
-                        }
+                        {this.getTechnologyCount(tech)} solution
+                        {this.getTechnologyCount(tech) === 1 ? '' : 's'}
                       </span>
-
                     </button>
-
                   ))}
-
                 </div>
-
               </section>
 
-              {/* MOST HELPFUL + RECENT */}
-
-              <section
-                className={
-                  styles.bottomGrid
-                }
-              >
-
-                {/* MOST HELPFUL */}
-
+              <section className={styles.bottomGrid}>
                 <div>
-
-                  <div
-                    className={
-                      styles.sectionHeader
-                    }
-                  >
-
+                  <div className={styles.sectionHeader}>
                     <div>
-
-                      <h2>
-                        Most Helpful Solutions
-                      </h2>
-
-                      <p>
-                        Ranked by team votes
-                      </p>
-
+                      <h2>Most Helpful Solutions</h2>
+                      <p>Ranked by team votes</p>
                     </div>
-
                   </div>
 
-                  <div
-                    className={
-                      styles.listCard
-                    }
-                  >
-
-                    {mostHelpful.map(
-                      (solution, index) => (
-
-                        <div
-                          key={solution.Id}
-                          className={
-                            styles.listItem
-                          }
-                        >
-
-                          <strong>
-                            {index + 1}
-                          </strong>
-
-                          <div>
-
-                            <h4>
-                              {solution.Title}
-                            </h4>
-
-                            <span>
-                              {solution.Technology}
-                              {' · '}
-                              {solution.Difficulty}
-                            </span>
-
-                          </div>
-
-                          <b>
-                            👍 {solution.HelpfulCount}
-                          </b>
-
-                        </div>
-
-                      )
-                    )}
-
-                  </div>
-
-                </div>
-
-                {/* RECENT */}
-
-                <div>
-
-                  <div
-                    className={
-                      styles.sectionHeader
-                    }
-                  >
-
-                    <div>
-
-                      <h2>
-                        Recently Added
-                      </h2>
-
-                      <p>
-                        Fresh from the team
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                  <div
-                    className={
-                      styles.listCard
-                    }
-                  >
-
-                    {recent.map(solution => (
-
+                  <div className={styles.listCard}>
+                    {mostHelpful.map((solution, index) => (
                       <div
                         key={solution.Id}
-                        className={
-                          styles.listItem
-                        }
+                        className={styles.listItem}
                       >
+                        <strong>{index + 1}</strong>
 
                         <div>
-
-                          <h4>
-                            {solution.Title}
-                          </h4>
-
+                          <h4>{solution.Title}</h4>
                           <span>
                             {solution.Technology}
                             {' · '}
-                            {this.formatDate(
-                              solution.Created
-                            )}
+                            {solution.Difficulty}
                           </span>
+                        </div>
 
+                        <b>👍 {solution.HelpfulCount}</b>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div className={styles.sectionHeader}>
+                    <div>
+                      <h2>Recently Added</h2>
+                      <p>Fresh from the team</p>
+                    </div>
+                  </div>
+
+                  <div className={styles.listCard}>
+                    {recent.map(solution => (
+                      <div
+                        key={solution.Id}
+                        className={styles.listItem}
+                      >
+                        <div>
+                          <h4>{solution.Title}</h4>
+                          <span>
+                            {solution.Technology}
+                            {' · '}
+                            {this.formatDate(solution.Created)}
+                          </span>
                         </div>
 
                         <button
                           type="button"
-                          className={
-                            styles.recentViewButton
-                          }
+                          className={styles.recentViewButton}
                           onClick={() =>
                             this.setState({
                               page: 'details',
-                              selectedSolutionId:
-                                solution.Id,
-                              isAdminViewingSolution:
-                                false
+                              selectedSolutionId: solution.Id,
+                              isAdminViewingSolution: false
                             })
                           }
                         >
                           View
                         </button>
-
                       </div>
-
                     ))}
-
                   </div>
-
                 </div>
-
               </section>
-
             </>
           )}
-
         </main>
-
       </div>
     );
   }

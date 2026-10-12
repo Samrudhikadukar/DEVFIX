@@ -685,4 +685,150 @@
   .cardActions {
     flex-wrap: wrap;
   }
+
+  
+.devFix {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+}
+
+.devFix *,
+.devFix *::before,
+.devFix *::after {
+  box-sizing: border-box;
+}
+
+.hero,
+.heroContent,
+.mainContainer,
+.searchContainer,
+.section,
+.statsGrid,
+.solutionGrid,
+.techGrid,
+.bottomGrid {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.hero h1 {
+  overflow-wrap: anywhere;
+}
+
+.searchInputWrapper,
+.searchInputWrapper input {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.solutionGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.statsGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.techGrid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.solutionCard,
+.statCard,
+.technologyCard,
+.listCard {
+  min-width: 0;
+}
+
+.sectionHeader {
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+@media screen and (max-width: 1000px) {
+  .solutionGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .techGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .heroContent {
+    padding: 40px 16px;
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 7vw, 42px);
+    letter-spacing: -0.8px;
+  }
+
+  .mainContainer {
+    padding: 24px 12px 40px;
+  }
+
+  .statsGrid,
+  .solutionGrid,
+  .techGrid,
+  .bottomGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sectionHeader {
+    align-items: flex-start;
+  }
+
+  .statCard {
+    padding: 16px;
+  }
+
+  .solutionCard {
+    padding: 16px;
+  }
+
+  .emptyState,
+  .message {
+    padding: 24px 16px;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .heroContent {
+    padding: 32px 12px;
+  }
+
+  .hero h1 {
+    font-size: 30px;
+  }
+
+  .hero p {
+    font-size: 14px;
+  }
+
+  .mainContainer {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .cardTop {
+    flex-wrap: wrap;
+  }
+
+  .cardActions {
+    flex-wrap: wrap;
+  }
+
+  .helpfulButton,
+  .viewSolutionButton {
+    max-width: 100%;
+  }
+}
 }

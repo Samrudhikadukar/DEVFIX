@@ -1,8 +1,10 @@
+
 .solutionsPage {
   min-height: 100vh;
   background: #f8fafc;
   padding: 40px 20px 70px;
   color: #111827;
+  box-sizing: border-box;
 }
 
 .header {
@@ -24,24 +26,20 @@
 }
 
 .backButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
   margin-bottom: 22px;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: #64748b;
+  font-family: "Segoe UI", sans-serif;
   font-size: 13px;
   font-weight: 600;
-  cursor: pointer;
 }
 
 .backButton:hover {
   background: #eef2ff;
   color: #6366f1;
 }
+
+/* ================================
+   FILTER CARD
+================================ */
 
 .filterCard {
   max-width: 1280px;
@@ -55,36 +53,68 @@
   border: 1px solid #e5e7eb;
   border-radius: 14px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
 }
 
 .searchBox {
-  flex: 1;
-  min-width: 280px;
+  flex: 1 1 280px;
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 10px 13px;
+  padding: 8px 13px;
   border: 1px solid #dbe0e6;
   border-radius: 9px;
   background: #ffffff;
+  box-sizing: border-box;
 }
 
-.searchBox svg {
-  color: #94a3b8;
-  flex-shrink: 0;
-}
+/* Fluent UI TextField */
 
-.searchBox input {
+.searchField {
+  flex: 1;
+  min-width: 0;
   width: 100%;
+}
+
+.searchField :global(.ms-TextField-wrapper),
+.searchField :global(.ms-TextField),
+.searchField :global(.ms-TextField-fieldGroup) {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.searchField :global(.ms-TextField-fieldGroup) {
+  min-height: 26px;
   border: none;
-  outline: none;
+  background: transparent;
+}
+
+.searchField :global(.ms-TextField-fieldGroup::after) {
+  border: none;
+}
+
+.searchField :global(.ms-TextField-field) {
+  padding: 0;
+  font-family: "Segoe UI", sans-serif;
   font-size: 13px;
   color: #111827;
+  background: transparent;
 }
 
-.searchBox input::placeholder {
+.searchField :global(.ms-TextField-field::placeholder) {
   color: #94a3b8;
 }
+
+.searchField :global(.ms-TextField-field:focus) {
+  outline: none;
+}
+
+.searchBox:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+/* Filter title */
 
 .filterTitle {
   display: flex;
@@ -93,45 +123,71 @@
   color: #475569;
   font-size: 13px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
-.filterCard select {
-  padding: 10px 12px;
+/* Fluent UI Dropdown */
+
+.filterDropdown {
+  flex: 1 1 150px;
+  min-width: 150px;
+  max-width: 220px;
+}
+
+.filterDropdown :global(.ms-Dropdown) {
+  width: 100%;
+}
+
+.filterDropdown :global(.ms-Dropdown-title) {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
   border: 1px solid #dbe0e6;
   border-radius: 9px;
   background: #ffffff;
   color: #475569;
+  font-family: "Segoe UI", sans-serif;
   font-size: 13px;
-  outline: none;
-  cursor: pointer;
+  box-sizing: border-box;
 }
 
-.filterCard select:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+.filterDropdown :global(.ms-Dropdown-title:hover) {
+  border-color: #a5b4fc;
 }
+
+.filterDropdown :global(.ms-Dropdown-title:focus) {
+  border-color: #6366f1;
+  outline: none;
+}
+
+.filterDropdown :global(.ms-Dropdown-caretDownWrapper) {
+  height: 100%;
+}
+
+/* Clear filters */
 
 .clearFilters {
-  height: 38px;
-  padding: 0 12px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: #64748b;
+  min-height: 38px;
+  font-family: "Segoe UI", sans-serif;
   font-size: 13px;
   font-weight: 500;
-  cursor: pointer;
-}
-
-.clearFilters:hover:not(:disabled) {
-  background: #f1f5f9;
-  color: #111827;
+  border-radius: 8px;
 }
 
 .clearFilters:disabled {
   opacity: 0.4;
   cursor: default;
 }
+
+.clearFilters:not(:disabled):hover {
+  background: #f1f5f9;
+  color: #111827;
+}
+
+/* ================================
+   RESULTS
+================================ */
 
 .resultInfo {
   max-width: 1280px;
@@ -160,7 +216,9 @@
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 14px;
-  transition: 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  box-sizing: border-box;
 }
 
 .solutionCard:hover {
@@ -184,28 +242,8 @@
   min-width: 0;
 }
 
-.techBadge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 9px;
-  border-radius: 999px;
-  background: #eef2ff;
-  color: #6366f1;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.categoryBadge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 9px;
-  border-radius: 999px;
-  background: #f3e8ff;
-  color: #7c3aed;
-  font-size: 11px;
-  font-weight: 700;
-}
-
+.techBadge,
+.categoryBadge,
 .easy,
 .medium,
 .hard {
@@ -215,6 +253,16 @@
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
+}
+
+.techBadge {
+  background: #eef2ff;
+  color: #6366f1;
+}
+
+.categoryBadge {
+  background: #f3e8ff;
+  color: #7c3aed;
 }
 
 .easy {
@@ -232,20 +280,17 @@
   color: #dc2626;
 }
 
+/* Favorite Fluent UI IconButton */
+
 .favoriteButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  flex-shrink: 0;
+  min-width: 34px;
   width: 34px;
   height: 34px;
-  padding: 0;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #ffffff;
   color: #64748b;
-  cursor: pointer;
-  transition: 0.2s ease;
-  flex-shrink: 0;
 }
 
 .favoriteButton:hover {
@@ -254,12 +299,17 @@
   color: #f59e0b;
 }
 
+.favoriteButton :global(.ms-Button-icon) {
+  color: inherit;
+}
+
 .solutionCard h3 {
   margin: 18px 0 8px;
   font-size: 17px;
   font-weight: 700;
   line-height: 1.4;
   letter-spacing: -0.2px;
+  overflow-wrap: anywhere;
 }
 
 .solutionCard p {
@@ -271,6 +321,7 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  overflow-wrap: anywhere;
   min-height: 62px;
 }
 
@@ -282,13 +333,17 @@
 }
 
 .tag {
+  max-width: 100%;
   padding: 3px 8px;
   border-radius: 6px;
   background: #f1f5f9;
   color: #64748b;
   font-family: monospace;
   font-size: 11px;
+  overflow-wrap: anywhere;
 }
+
+/* Card actions */
 
 .cardActions {
   display: flex;
@@ -300,19 +355,17 @@
   border-top: 1px solid #f1f5f9;
 }
 
+/* Fluent UI Helpful button */
+
 .helpfulButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 10px;
+  min-height: 34px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #ffffff;
   color: #64748b;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: 0.2s ease;
 }
 
 .helpfulButton:hover {
@@ -321,22 +374,24 @@
   background: #eef2ff;
 }
 
+/* Fluent UI View Solution button */
+
 .viewSolutionButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: #6366f1;
+  min-height: 34px;
+  font-family: "Segoe UI", sans-serif;
   font-size: 13px;
   font-weight: 700;
-  cursor: pointer;
+  border-radius: 8px;
+  background: #6366f1;
+  border-color: #6366f1;
 }
 
 .viewSolutionButton:hover {
-  color: #4f46e5;
+  background: #4f46e5;
+  border-color: #4f46e5;
 }
+
+/* Empty and loading states */
 
 .emptyState,
 .message {
@@ -348,6 +403,7 @@
   border: 1px solid #e5e7eb;
   border-radius: 14px;
   color: #64748b;
+  box-sizing: border-box;
 }
 
 .emptyState h3 {
@@ -360,6 +416,11 @@
   margin: 0;
   color: #64748b;
 }
+
+/* ================================
+   ADD SOLUTION FORM
+   Existing form styles preserved
+================================ */
 
 .addSolutionPage {
   width: 100%;
@@ -428,9 +489,7 @@
   font-family: "Segoe UI", sans-serif;
   font-size: 14px;
   outline: none;
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .formInput {
@@ -460,12 +519,6 @@
   border-color: #dc2626;
 }
 
-.formThreeColumns {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-}
-
 .codeInput {
   min-height: 80px;
   font-family: Consolas, "Courier New", monospace;
@@ -487,6 +540,12 @@
   font-size: 12px;
 }
 
+.formThreeColumns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
 .formActions {
   display: flex;
   justify-content: flex-end;
@@ -499,16 +558,14 @@
 
 .cancelButton,
 .saveButton {
-  height: 42px;
+  min-height: 42px;
   padding: 0 18px;
   border-radius: 9px;
   font-family: "Segoe UI", sans-serif;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease,
+  transition: background 0.15s ease, border-color 0.15s ease,
     opacity 0.15s ease;
 }
 
@@ -540,6 +597,10 @@
   cursor: not-allowed;
 }
 
+/* ================================
+   RESPONSIVE LAYOUT
+================================ */
+
 @media screen and (max-width: 1000px) {
   .solutionGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -549,8 +610,8 @@
     align-items: stretch;
   }
 
-  .filterCard select {
-    flex: 1;
+  .filterDropdown {
+    max-width: none;
   }
 
   .addSolutionPage {
@@ -568,20 +629,31 @@
   }
 
   .solutionGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
   }
 
   .searchBox {
-    min-width: 100%;
+    flex-basis: 100%;
+    width: 100%;
   }
 
   .filterTitle {
     width: 100%;
   }
 
-  .filterCard select,
+  .filterDropdown {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+  }
+
   .clearFilters {
     width: 100%;
+  }
+
+  .cardActions {
+    flex-wrap: wrap;
   }
 
   .addSolutionPage {
@@ -598,7 +670,7 @@
   }
 
   .formThreeColumns {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0;
   }
 
@@ -614,6 +686,19 @@
 }
 
 @media screen and (max-width: 450px) {
+  .solutionsPage {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .solutionCard {
+    padding: 16px;
+  }
+
+  .cardActions {
+    align-items: stretch;
+  }
+
   .addSolutionPage {
     padding: 24px 12px 35px;
   }
@@ -622,3 +707,4 @@
     padding: 20px 16px;
   }
 }
+

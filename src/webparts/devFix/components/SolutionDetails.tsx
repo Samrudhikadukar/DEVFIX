@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import styles from './SolutionDetails.module.scss';
 import { UserService, ICurrentUser } from '../services/UserService';
@@ -12,6 +13,14 @@ import {
     Star,
     ThumbsUp
 } from 'lucide-react';
+
+import {
+    DefaultButton,
+    Spinner,
+    SpinnerSize,
+    MessageBar,
+    MessageBarType
+} from '@fluentui/react';
 
 import { WebPartContext } from '@microsoft/sp-webpart-base';
 import { SharePointService } from '../services/SharePointService';
@@ -56,10 +65,7 @@ interface ISolutionDetailsState {
 }
 
 export default class SolutionDetails
-    extends React.Component<
-        ISolutionDetailsProps,
-        ISolutionDetailsState
-    > {
+    extends React.Component<ISolutionDetailsProps, ISolutionDetailsState> {
 
     private sharePointService: SharePointService;
     private userService: UserService;
@@ -70,38 +76,25 @@ export default class SolutionDetails
         error: '',
         helpfulLoading: false,
         currentUser: null,
-        favoriteLoading: false,
+        favoriteLoading: false
     };
 
     constructor(props: ISolutionDetailsProps) {
         super(props);
 
-        this.sharePointService =
-            new SharePointService(props.context);
-
-        this.userService =
-            new UserService(props.context);
+        this.sharePointService = new SharePointService(props.context);
+        this.userService = new UserService(props.context);
     }
 
     public async componentDidMount(): Promise<void> {
         try {
-            const currentUser =
-                await this.userService.getCurrentUser();
+            const currentUser = await this.userService.getCurrentUser();
 
-            this.setState(
-                {
-                    currentUser
-                },
-                async () => {
-                    await this.loadSolution();
-                }
-            );
+            this.setState({ currentUser }, async () => {
+                await this.loadSolution();
+            });
         } catch (error) {
-            console.error(
-                'Error loading current user:',
-                error
-            );
-
+            console.error('Error loading current user:', error);
             await this.loadSolution();
         }
     }
@@ -116,11 +109,10 @@ export default class SolutionDetails
             let isFavorite = false;
 
             if (this.state.currentUser) {
-                isFavorite =
-                    await this.sharePointService.isFavorite(
-                        this.props.solutionId,
-                        this.state.currentUser.id
-                    );
+                isFavorite = await this.sharePointService.isFavorite(
+                    this.props.solutionId,
+                    this.state.currentUser.id
+                );
             }
 
             this.setState({
@@ -131,10 +123,7 @@ export default class SolutionDetails
                 loading: false
             });
         } catch (error) {
-            console.error(
-                'Error loading solution details:',
-                error
-            );
+            console.error('Error loading solution details:', error);
 
             this.setState({
                 loading: false,
@@ -144,17 +133,12 @@ export default class SolutionDetails
     }
 
     private async handleHelpful(): Promise<void> {
-        if (
-            !this.state.solution ||
-            this.state.helpfulLoading
-        ) {
+        if (!this.state.solution || this.state.helpfulLoading) {
             return;
         }
 
         try {
-            this.setState({
-                helpfulLoading: true
-            });
+            this.setState({ helpfulLoading: true });
 
             await this.sharePointService.markHelpful(
                 this.state.solution.Id
@@ -169,14 +153,9 @@ export default class SolutionDetails
                 helpfulLoading: false
             });
         } catch (error) {
-            console.error(
-                'Error marking solution as helpful:',
-                error
-            );
+            console.error('Error marking solution as helpful:', error);
 
-            this.setState({
-                helpfulLoading: false
-            });
+            this.setState({ helpfulLoading: false });
         }
     }
 
@@ -190,15 +169,12 @@ export default class SolutionDetails
         }
 
         try {
-            this.setState({
-                favoriteLoading: true
-            });
+            this.setState({ favoriteLoading: true });
 
             const solutionId = this.state.solution.Id;
             const userId = this.state.currentUser.id;
 
             if (this.state.solution.IsFavorite) {
-
                 await this.sharePointService.removeFavorite(
                     solutionId,
                     userId
@@ -211,9 +187,7 @@ export default class SolutionDetails
                     },
                     favoriteLoading: false
                 });
-
             } else {
-
                 await this.sharePointService.addFavorite(
                     solutionId,
                     userId
@@ -227,32 +201,21 @@ export default class SolutionDetails
                     favoriteLoading: false
                 });
             }
-
         } catch (error) {
-            console.error(
-                'Error updating favorite:',
-                error
-            );
+            console.error('Error updating favorite:', error);
 
-            this.setState({
-                favoriteLoading: false
-            });
+            this.setState({ favoriteLoading: false });
         }
     }
 
-    private getDifficultyClass(
-        difficulty: string
-    ): string {
+    private getDifficultyClass(difficulty: string): string {
         switch (difficulty) {
             case 'Easy':
                 return styles.easy;
-
             case 'Medium':
                 return styles.medium;
-
             case 'Hard':
                 return styles.hard;
-
             default:
                 return '';
         }
@@ -263,25 +226,18 @@ export default class SolutionDetails
             return '';
         }
 
-        return new Date(date).toLocaleDateString(
-            'en-US',
-            {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-            }
-        );
+        return new Date(date).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
     }
 
     private renderBadge(
         text: string,
         className: string
     ): React.ReactElement {
-        return (
-            <span className={className}>
-                {text}
-            </span>
-        );
+        return <span className={className}>{text}</span>;
     }
 
     private renderBlock(
@@ -294,63 +250,58 @@ export default class SolutionDetails
         return (
             <section className={styles.block}>
                 <h2 className={styles.blockTitle}>
-                    <span
-                        className={`${styles.blockIcon} ${toneClass}`}
-                    >
+                    <span className={`${styles.blockIcon} ${toneClass}`}>
                         {icon}
                     </span>
-
                     {title}
                 </h2>
 
                 {isCode ? (
-                    <pre className={styles.errorMessage}>
-                        {content}
-                    </pre>
+                    <pre className={styles.errorMessage}>{content}</pre>
                 ) : (
-                    <p className={styles.blockContent}>
-                        {content}
-                    </p>
+                    <p className={styles.blockContent}>{content}</p>
                 )}
             </section>
         );
     }
 
     public render(): React.ReactElement<ISolutionDetailsProps> {
-        const {
-            solution,
-            loading,
-            error
-        } = this.state;
+        const { solution, loading, error } = this.state;
 
+        // LOADING
         if (loading) {
             return (
                 <section className={styles.detailsPage}>
                     <div className={styles.message}>
-                        Loading solution...
+                        <Spinner
+                            size={SpinnerSize.medium}
+                            label="Loading solution..."
+                        />
                     </div>
                 </section>
             );
         }
 
+        // ERROR
         if (error || !solution) {
             return (
                 <section className={styles.detailsPage}>
                     <div className={styles.message}>
                         <h2>Solution not found</h2>
 
-                        <p>
-                            This solution may have been deleted.
-                        </p>
+                        <MessageBar
+                            messageBarType={MessageBarType.error}
+                            isMultiline={true}
+                        >
+                            {error || 'This solution may have been deleted.'}
+                        </MessageBar>
 
-                        <button
-                            type="button"
+                        <DefaultButton
                             className={styles.backButton}
                             onClick={this.props.onBack}
-                        >
-                            <ArrowLeft size={16} />
-                            Back to solutions
-                        </button>
+                            text="Back to solutions"
+                            iconProps={{ iconName: 'Back' }}
+                        />
                     </div>
                 </section>
             );
@@ -363,24 +314,34 @@ export default class SolutionDetails
 
         return (
             <section className={styles.detailsPage}>
-
                 <div className={styles.content}>
 
                     {/* BACK */}
-                    <button
-                        type="button"
+                    <DefaultButton
                         className={styles.backLink}
                         onClick={this.props.onBack}
-                    >
-                        <ArrowLeft size={16} />
-                        All solutions
-                    </button>
+                        text="All solutions"
+                        iconProps={{ iconName: 'Back' }}
+                        styles={{
+                            root: {
+                                background: 'transparent',
+                                border: 'none',
+                                padding: 0,
+                                minWidth: 0,
+                                height: 'auto'
+                            },
+                            rootHovered: {
+                                background: 'transparent'
+                            },
+                            label: {
+                                fontWeight: 500
+                            }
+                        }}
+                    />
 
                     {/* HEADER */}
                     <header className={styles.header}>
-
                         <div className={styles.badges}>
-
                             {this.renderBadge(
                                 solution.Technology,
                                 styles.techBadge
@@ -393,9 +354,7 @@ export default class SolutionDetails
 
                             {this.renderBadge(
                                 solution.Difficulty,
-                                this.getDifficultyClass(
-                                    solution.Difficulty
-                                )
+                                this.getDifficultyClass(solution.Difficulty)
                             )}
 
                             {solution.Status !== 'Published' &&
@@ -403,12 +362,9 @@ export default class SolutionDetails
                                     solution.Status,
                                     styles.statusBadge
                                 )}
-
                         </div>
 
-                        <h1>
-                            {solution.Title}
-                        </h1>
+                        <h1>{solution.Title}</h1>
 
                         <p className={styles.author}>
                             by{' '}
@@ -423,40 +379,58 @@ export default class SolutionDetails
                         <div className={styles.actions}>
 
                             {/* HELPFUL */}
-                            <button
-                                type="button"
+                            <DefaultButton
                                 className={styles.helpfulButton}
                                 onClick={() => this.handleHelpful()}
                                 disabled={this.state.helpfulLoading}
+                                styles={{
+                                    root: {
+                                        height: 'auto',
+                                        minHeight: 36,
+                                        padding: '9px 13px'
+                                    },
+                                    flexContainer: {
+                                        gap: 7
+                                    }
+                                }}
                             >
                                 <ThumbsUp size={16} />
-
-                                Helpful ·{' '}
-                                {solution.HelpfulCount || 0}
-                            </button>
+                                Helpful · {solution.HelpfulCount || 0}
+                            </DefaultButton>
 
                             {/* FAVORITE */}
-                            <button
-                                type="button"
+                            <DefaultButton
                                 className={styles.favoriteButton}
                                 onClick={() => this.handleFavorite()}
-                                disabled={this.state.favoriteLoading}
+                                disabled={
+                                    this.state.favoriteLoading ||
+                                    !this.state.currentUser
+                                }
+                                styles={{
+                                    root: {
+                                        height: 'auto',
+                                        minHeight: 36,
+                                        padding: '9px 13px'
+                                    },
+                                    flexContainer: {
+                                        gap: 7
+                                    }
+                                }}
                             >
-                                <Star size={16} />
-
+                                <Star
+                                    size={16}
+                                    fill={solution.IsFavorite ? 'currentColor' : 'none'}
+                                />
                                 {solution.IsFavorite
                                     ? 'Saved to Favorites'
                                     : 'Add to Favorites'}
-                            </button>
-
+                            </DefaultButton>
                         </div>
-
                     </header>
 
                     {/* DETAILS */}
                     <div className={styles.blocks}>
 
-                        {/* PROBLEM */}
                         {this.renderBlock(
                             <Bug size={16} />,
                             'Problem',
@@ -464,18 +438,14 @@ export default class SolutionDetails
                             styles.dangerTone
                         )}
 
-                        {/* ERROR */}
-                        {solution.ErrorMessage && (
-                            this.renderBlock(
-                                <AlertTriangle size={16} />,
-                                'Error Message',
-                                solution.ErrorMessage,
-                                styles.warningTone,
-                                true
-                            )
+                        {solution.ErrorMessage && this.renderBlock(
+                            <AlertTriangle size={16} />,
+                            'Error Message',
+                            solution.ErrorMessage,
+                            styles.warningTone,
+                            true
                         )}
 
-                        {/* CAUSE */}
                         {this.renderBlock(
                             <Search size={16} />,
                             'Cause',
@@ -483,7 +453,6 @@ export default class SolutionDetails
                             styles.violetTone
                         )}
 
-                        {/* SOLUTION */}
                         {this.renderBlock(
                             <CheckCircle2 size={16} />,
                             'Solution',
@@ -491,17 +460,13 @@ export default class SolutionDetails
                             styles.successTone
                         )}
 
-                        {/* LESSON */}
-                        {solution.LessonLearned && (
-                            this.renderBlock(
-                                <Lightbulb size={16} />,
-                                'Lesson Learned',
-                                solution.LessonLearned,
-                                styles.primaryTone
-                            )
+                        {solution.LessonLearned && this.renderBlock(
+                            <Lightbulb size={16} />,
+                            'Lesson Learned',
+                            solution.LessonLearned,
+                            styles.primaryTone
                         )}
 
-                        {/* TAGS */}
                         {tags.length > 0 && (
                             <div className={styles.tags}>
                                 {tags.map(tag => (
@@ -514,11 +479,8 @@ export default class SolutionDetails
                                 ))}
                             </div>
                         )}
-
                     </div>
-
                 </div>
-
             </section>
         );
     }
