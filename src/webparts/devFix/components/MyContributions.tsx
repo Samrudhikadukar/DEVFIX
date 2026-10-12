@@ -1,19 +1,19 @@
+
 import * as React from "react";
 import { WebPartContext } from "@microsoft/sp-webpart-base";
-import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import { Icon } from "@fluentui/react";
 
 import { SharePointService } from "../services/SharePointService";
 import { UserService, ICurrentUser } from "../services/UserService";
 
-//import styles from "./Solutions.module.scss";
 import styles from "./MyContributions.module.scss";
 
 interface IMyContributionsProps {
   context: WebPartContext;
   onBack: () => void;
   onViewSolution: (id: number) => void;
-   onAddSolution: () => void;
-   onEditSolution: (id: number) => void;
+  onAddSolution: () => void;
+  onEditSolution: (id: number) => void;
 }
 
 interface IMyContributionsState {
@@ -21,7 +21,6 @@ interface IMyContributionsState {
   loading: boolean;
   error: string;
   currentUser: ICurrentUser | null;
-
 }
 
 export default class MyContributions extends React.Component<
@@ -78,18 +77,17 @@ export default class MyContributions extends React.Component<
     }
   }
 
-private handleAddSolution = (): void => {
-  this.props.onAddSolution();
-};
+  private handleAddSolution = (): void => {
+    this.props.onAddSolution();
+  };
 
   private handleView = (id: number): void => {
     this.props.onViewSolution(id);
   };
 
-  
-private handleEdit = (id: number): void => {
-  this.props.onEditSolution(id);
-};
+  private handleEdit = (id: number): void => {
+    this.props.onEditSolution(id);
+  };
 
   private handleDelete = async (id: number): Promise<void> => {
     const confirmed = window.confirm(
@@ -103,11 +101,12 @@ private handleEdit = (id: number): void => {
     try {
       await this.sharePointService.deleteSolution(id);
 
-      this.setState({
-        solutions: this.state.solutions.filter(
-          solution => solution.Id !== id
-        )
-      });
+      this.setState(prevState => ({
+        solutions: prevState.solutions.filter(
+          solution => Number(solution.Id) !== id
+        ),
+        error: ""
+      }));
     } catch (error) {
       console.error("Error deleting solution:", error);
 
@@ -146,21 +145,11 @@ private handleEdit = (id: number): void => {
   }
 
   public render(): React.ReactElement {
-    const {
-      solutions,
-      loading,
-      error
-    } = this.state;
+    const { solutions, loading, error } = this.state;
 
     return (
       <div className={styles.solutionsPage}>
-
-        {/* =========================
-            MY CONTRIBUTIONS HEADER
-        ========================= */}
-
         <div className={styles.contributionsHeader}>
-
           <div>
             <h1>My Contributions</h1>
 
@@ -175,16 +164,13 @@ private handleEdit = (id: number): void => {
             className={styles.addSolutionButton}
             onClick={this.handleAddSolution}
           >
-            <Plus size={16} />
+            <Icon
+              iconName="Add"
+              styles={{ root: { fontSize: 16 } }}
+            />
             Add Solution
           </button>
-
         </div>
-
-
-        {/* =========================
-            ERROR
-        ========================= */}
 
         {error && (
           <div className={styles.message}>
@@ -192,92 +178,44 @@ private handleEdit = (id: number): void => {
           </div>
         )}
 
-
-        {/* =========================
-            LOADING
-        ========================= */}
-
         {loading && (
           <div className={styles.message}>
             Loading your contributions...
           </div>
         )}
 
-
-        {/* =========================
-            EMPTY STATE
-        ========================= */}
-
         {!loading && !error && solutions.length === 0 && (
           <div className={styles.emptyState}>
-
             <h3>No contributions yet</h3>
 
             <p>
               Share your first fix with the team.
             </p>
-
           </div>
         )}
 
-
-        {/* =========================
-            TABLE
-        ========================= */}
-
         {!loading && solutions.length > 0 && (
-
           <div className={styles.contributionsTableCard}>
-
             <table className={styles.contributionsTable}>
-
               <thead>
                 <tr>
-
-                  <th>
-                    Solution
-                  </th>
-
-                  <th>
-                    Technology
-                  </th>
-
-                  <th>
-                    Category
-                  </th>
-
-                  <th>
-                    Status
-                  </th>
-
-                  <th>
-                    Created
-                  </th>
-
+                  <th>Solution</th>
+                  <th>Technology</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                  <th>Created</th>
                   <th className={styles.actionsHeader}>
                     Actions
                   </th>
-
                 </tr>
               </thead>
 
-
               <tbody>
-
-                {solutions.map((solution) => (
-
+                {solutions.map(solution => (
                   <tr key={solution.Id}>
-
-                    {/* Solution */}
-
                     <td className={styles.solutionTitleCell}>
-                      <span>
-                        {solution.Title}
-                      </span>
+                      <span>{solution.Title}</span>
                     </td>
-
-
-                    {/* Technology */}
 
                     <td>
                       <span className={styles.tableTechBadge}>
@@ -285,15 +223,9 @@ private handleEdit = (id: number): void => {
                       </span>
                     </td>
 
-
-                    {/* Category */}
-
                     <td className={styles.tableMutedText}>
                       {solution.Category}
                     </td>
-
-
-                    {/* Status */}
 
                     <td>
                       <span
@@ -305,80 +237,66 @@ private handleEdit = (id: number): void => {
                       </span>
                     </td>
 
-
-                    {/* Created */}
-
                     <td className={styles.tableMutedText}>
-                      {this.formatDate(
-                        solution.Created
-                      )}
+                      {this.formatDate(solution.Created)}
                     </td>
 
-
-                    {/* Actions */}
-
                     <td>
-
                       <div className={styles.tableActions}>
-
-                        {/* View */}
-
                         <button
                           type="button"
                           className={styles.tableIconButton}
                           title="View"
+                          aria-label="View solution"
                           onClick={() =>
-                            this.handleView(solution.Id)
+                            this.handleView(Number(solution.Id))
                           }
                         >
-                          <Eye size={16} />
+                          <Icon
+                            iconName="View"
+                            styles={{ root: { fontSize: 16 } }}
+                          />
                         </button>
-
-
-                        {/* Edit */}
 
                         <button
                           type="button"
                           className={styles.tableIconButton}
                           title="Edit"
+                          aria-label="Edit solution"
                           onClick={() =>
-                            this.handleEdit(solution.Id)
+                            this.handleEdit(Number(solution.Id))
                           }
                         >
-                          <Pencil size={16} />
+                          <Icon
+                            iconName="Edit"
+                            styles={{ root: { fontSize: 16 } }}
+                          />
                         </button>
-
-
-                        {/* Delete */}
 
                         <button
                           type="button"
                           className={styles.tableIconButton}
                           title="Delete"
+                          aria-label="Delete solution"
                           onClick={() =>
-                            this.handleDelete(solution.Id)
+                            this.handleDelete(Number(solution.Id))
                           }
                         >
-                          <Trash2 size={16} />
+                          <Icon
+                            iconName="Delete"
+                            styles={{ root: { fontSize: 16 } }}
+                          />
                         </button>
-
                       </div>
-
                     </td>
-
                   </tr>
-
                 ))}
-
               </tbody>
-
             </table>
-
           </div>
-
         )}
-
       </div>
     );
   }
 }
+

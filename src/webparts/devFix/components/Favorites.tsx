@@ -7,9 +7,9 @@ import {
   MessageBar,
   MessageBarType,
   DefaultButton,
-  IconButton
+  IconButton,
+  Icon
 } from "@fluentui/react";
-import { Star } from "lucide-react";
 
 import { SharePointService } from "../services/SharePointService";
 import { ICurrentUser } from "../services/UserService";
@@ -115,6 +115,7 @@ export default class Favorites extends React.Component<
         <IconButton
           title="Remove from favorites"
           ariaLabel="Remove from favorites"
+          iconProps={{ iconName: "FavoriteStarFill" }}
           onClick={() =>
             this.removeFavorite(Number(solution.Id))
           }
@@ -124,11 +125,12 @@ export default class Favorites extends React.Component<
               top: 12,
               right: 12,
               color: "#f59e0b"
+            },
+            icon: {
+              fontSize: 20
             }
           }}
-        >
-          <Star size={20} fill="currentColor" />
-        </IconButton>
+        />
 
         <Text
           variant="small"
@@ -293,7 +295,15 @@ export default class Favorites extends React.Component<
               }
             }}
           >
-            <Star size={32} color="#9ca3af" />
+            <Icon
+              iconName="FavoriteStar"
+              styles={{
+                root: {
+                  fontSize: 32,
+                  color: "#9ca3af"
+                }
+              }}
+            />
 
             <Text
               variant="xLarge"
@@ -340,3 +350,4 @@ export default class Favorites extends React.Component<
     );
   }
 }
+

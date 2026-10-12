@@ -1,5 +1,6 @@
+
 import * as React from 'react';
-import { WebPartContext } from '@microsoft/sp-webpart-base';
+import { Icon } from '@fluentui/react';
 
 import styles from './DevFix.module.scss';
 import type { IDevFixProps } from './IDevFixProps';
@@ -15,15 +16,6 @@ import AddSolutionForm, { IAddSolutionInput } from './AddSolutionForm';
 import AdminDashboard from './AdminDashboard';
 import ManageUsers from './ManageUsers';
 import Favorites from './Favorites';
-
-import {
-  BookOpen,
-  Layers,
-  Sparkles,
-  ThumbsUp,
-  User,
-  ArrowRight
-} from 'lucide-react';
 
 interface ISolution {
   Id: number;
@@ -66,22 +58,22 @@ interface IDevFixState {
   category: string;
   difficulty: string;
   page:
-  | 'home'
-  | 'solutions'
-  | 'favorites'
-  | 'details'
-  | 'my-contributions'
-  | 'add-solution'
-  | 'admin'
-  | 'manage-users';
+    | 'home'
+    | 'solutions'
+    | 'favorites'
+    | 'details'
+    | 'my-contributions'
+    | 'add-solution'
+    | 'admin'
+    | 'manage-users';
   selectedSolutionId: number | null;
   isAdminViewingSolution: boolean;
   returnPage:
-  | 'home'
-  | 'solutions'
-  | 'my-contributions'
-  | 'admin'
-  | 'favorites';
+    | 'home'
+    | 'solutions'
+    | 'my-contributions'
+    | 'admin'
+    | 'favorites';
 }
 
 export default class DevFix extends React.Component<
@@ -103,7 +95,7 @@ export default class DevFix extends React.Component<
     page: 'home',
     selectedSolutionId: null,
     isAdminViewingSolution: false,
-    returnPage: 'solutions',
+    returnPage: 'solutions'
   };
 
   constructor(props: IDevFixProps) {
@@ -405,14 +397,11 @@ export default class DevFix extends React.Component<
 
     const myContributions = currentUser
       ? this.state.solutions.filter(
-        solution => solution.Author?.Id === currentUser.id
-      ).length
+          solution => solution.Author?.Id === currentUser.id
+        ).length
       : 0;
 
-    if (
-      page === 'details' &&
-      this.state.selectedSolutionId !== null
-    ) {
+    if (page === 'details' && this.state.selectedSolutionId !== null) {
       return (
         <div className={styles.devFix}>
           {currentUser && (
@@ -430,7 +419,6 @@ export default class DevFix extends React.Component<
           <SolutionDetails
             context={this.props.context}
             solutionId={this.state.selectedSolutionId}
-
             onBack={() =>
               this.setState({
                 page: this.state.returnPage,
@@ -443,10 +431,7 @@ export default class DevFix extends React.Component<
       );
     }
 
-    if (
-      page === 'manage-users' &&
-      currentUser?.role === 'ADMIN'
-    ) {
+    if (page === 'manage-users' && currentUser?.role === 'ADMIN') {
       return (
         <div className={styles.devFix}>
           <DevFixNavbar
@@ -529,25 +514,24 @@ export default class DevFix extends React.Component<
       const selectedSolution =
         this.state.selectedSolutionId !== null
           ? this.state.solutions.find(
-            solution =>
-              solution.Id === this.state.selectedSolutionId
-          )
+              solution => solution.Id === this.state.selectedSolutionId
+            )
           : undefined;
 
       const editSolution: IAddSolutionInput | undefined =
         selectedSolution
           ? {
-            title: selectedSolution.Title || '',
-            technology: selectedSolution.Technology || '',
-            category: selectedSolution.Category || '',
-            difficulty: selectedSolution.Difficulty || '',
-            problem: selectedSolution.Problem || '',
-            errorMessage: selectedSolution.ErrorMessage || '',
-            cause: selectedSolution.Cause || '',
-            solution: selectedSolution.Solution || '',
-            lessonLearned: selectedSolution.LessonLearned || '',
-            tags: selectedSolution.Tags || ''
-          }
+              title: selectedSolution.Title || '',
+              technology: selectedSolution.Technology || '',
+              category: selectedSolution.Category || '',
+              difficulty: selectedSolution.Difficulty || '',
+              problem: selectedSolution.Problem || '',
+              errorMessage: selectedSolution.ErrorMessage || '',
+              cause: selectedSolution.Cause || '',
+              solution: selectedSolution.Solution || '',
+              lessonLearned: selectedSolution.LessonLearned || '',
+              tags: selectedSolution.Tags || ''
+            }
           : undefined;
 
       return (
@@ -568,7 +552,6 @@ export default class DevFix extends React.Component<
             context={this.props.context}
             initialSolution={editSolution}
             isEditMode={this.state.selectedSolutionId !== null}
-
             onCancel={() =>
               this.setState({
                 page:
@@ -604,7 +587,6 @@ export default class DevFix extends React.Component<
             context={this.props.context}
             onBack={this.handleHome}
             onAddSolution={this.handleAddSolution}
-
             onViewSolution={(id: number) =>
               this.setState({
                 page: 'details',
@@ -613,7 +595,6 @@ export default class DevFix extends React.Component<
                 returnPage: 'my-contributions'
               })
             }
-
             onEditSolution={(id: number) =>
               this.setState({
                 page: 'add-solution',
@@ -651,7 +632,6 @@ export default class DevFix extends React.Component<
                 selectedSolutionId: id,
                 isAdminViewingSolution: false,
                 returnPage: 'solutions'
-
               })
             }
           />
@@ -676,7 +656,7 @@ export default class DevFix extends React.Component<
         <section className={styles.hero}>
           <div className={styles.heroContent}>
             <span className={styles.heroBadge}>
-              <Sparkles size={14} />
+              <Icon iconName="FavoriteStar" />
               Developer Problem Solver
             </span>
 
@@ -777,7 +757,7 @@ export default class DevFix extends React.Component<
         <main className={styles.mainContainer}>
           <section className={styles.statsGrid}>
             <div className={styles.statCard}>
-              <BookOpen />
+              <Icon iconName="ReadingMode" />
               <div>
                 <span>Total Solutions</span>
                 <strong>{published.length}</strong>
@@ -785,7 +765,7 @@ export default class DevFix extends React.Component<
             </div>
 
             <div className={styles.statCard}>
-              <Layers />
+              <Icon iconName="Stack" />
               <div>
                 <span>Technologies</span>
                 <strong>{technologies.length}</strong>
@@ -793,7 +773,7 @@ export default class DevFix extends React.Component<
             </div>
 
             <div className={styles.statCard}>
-              <ThumbsUp />
+              <Icon iconName="Like" />
               <div>
                 <span>Helpful Solutions</span>
                 <strong>
@@ -807,7 +787,7 @@ export default class DevFix extends React.Component<
             </div>
 
             <div className={styles.statCard}>
-              <User />
+              <Icon iconName="Contact" />
               <div>
                 <span>My Contributions</span>
                 <strong>{myContributions}</strong>
@@ -893,7 +873,6 @@ export default class DevFix extends React.Component<
                         </div>
 
                         <h3>{solution.Title}</h3>
-
                         <p>{solution.Problem}</p>
 
                         <div className={styles.tags}>
@@ -917,7 +896,7 @@ export default class DevFix extends React.Component<
                               event.stopPropagation()
                             }
                           >
-                            <ThumbsUp size={14} />
+                            <Icon iconName="Like" />
                             {solution.HelpfulCount}
                           </button>
 
@@ -936,7 +915,7 @@ export default class DevFix extends React.Component<
                             }}
                           >
                             View Solution
-                            <ArrowRight size={15} />
+                            <Icon iconName="ChevronRight" />
                           </button>
                         </div>
                       </div>
@@ -948,39 +927,6 @@ export default class DevFix extends React.Component<
                   </div>
                 )}
               </section>
-
-              {/* <section className={styles.section}>
-                <div className={styles.sectionHeader}>
-                  <div>
-                    <h2>Popular Technologies</h2>
-                    <p>Jump straight into a stack</p>
-                  </div>
-                </div>
-
-                <div className={styles.techGrid}>
-                  {technologies.map(tech => (
-                    <button
-                      key={tech}
-                      type="button"
-                      className={styles.technologyCard}
-                      onClick={() =>
-                        this.setState({ technology: tech })
-                      }
-                    >
-                      <div className={styles.techIcon}>
-                        <Layers size={20} />
-                      </div>
-
-                      <strong>{tech}</strong>
-
-                      <span>
-                        {this.getTechnologyCount(tech)} solution
-                        {this.getTechnologyCount(tech) === 1 ? '' : 's'}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </section> */}
 
               <section className={styles.bottomGrid}>
                 <div>
@@ -1063,3 +1009,4 @@ export default class DevFix extends React.Component<
     );
   }
 }
+
