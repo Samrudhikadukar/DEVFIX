@@ -949,7 +949,7 @@ export default class DevFix extends React.Component<
                 )}
               </section>
 
-              <section className={styles.section}>
+              {/* <section className={styles.section}>
                 <div className={styles.sectionHeader}>
                   <div>
                     <h2>Popular Technologies</h2>
@@ -980,7 +980,7 @@ export default class DevFix extends React.Component<
                     </button>
                   ))}
                 </div>
-              </section>
+              </section> */}
 
               <section className={styles.bottomGrid}>
                 <div>

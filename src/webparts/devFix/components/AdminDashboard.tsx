@@ -2,6 +2,7 @@ import * as React from 'react';
 import { WebPartContext } from '@microsoft/sp-webpart-base';
 
 import styles from './AdminDashboard.module.scss';
+import { UserService } from '../services/UserService';
 
 import {
   BookOpen,
@@ -167,6 +168,26 @@ onManageUsers,
 
   const [activeTab, setActiveTab] =
     React.useState<TabType>('All');
+
+    const [totalUsers, setTotalUsers] =
+  React.useState<number>(0);
+
+React.useEffect(() => {
+  const loadUsers = async (): Promise<void> => {
+    try {
+      const userService = new UserService(context);
+      const data = await userService.getUsers();
+
+      setTotalUsers(data.length);
+    } catch (error) {
+      console.error('Error loading total users:', error);
+    }
+  };
+
+  loadUsers().catch((error) => {
+    console.error('Error loading users:', error);
+  });
+}, [context]);
 
   const spService = React.useMemo(
     () => new SharePointService(context),
@@ -906,10 +927,9 @@ onManageUsers,
 
             <div
               className={
-                styles.statNumber
-              }
+                styles.statNumber}
             >
-              -
+              {totalUsers}
             </div>
 
           </div>
