@@ -66,16 +66,22 @@ interface IDevFixState {
   category: string;
   difficulty: string;
   page:
-    | 'home'
-    | 'solutions'
-    | 'favorites'
-    | 'details'
-    | 'my-contributions'
-    | 'add-solution'
-    | 'admin'
-    | 'manage-users';
+  | 'home'
+  | 'solutions'
+  | 'favorites'
+  | 'details'
+  | 'my-contributions'
+  | 'add-solution'
+  | 'admin'
+  | 'manage-users';
   selectedSolutionId: number | null;
   isAdminViewingSolution: boolean;
+  returnPage:
+  | 'home'
+  | 'solutions'
+  | 'my-contributions'
+  | 'admin'
+  | 'favorites';
 }
 
 export default class DevFix extends React.Component<
@@ -96,7 +102,8 @@ export default class DevFix extends React.Component<
     difficulty: '',
     page: 'home',
     selectedSolutionId: null,
-    isAdminViewingSolution: false
+    isAdminViewingSolution: false,
+    returnPage: 'solutions',
   };
 
   constructor(props: IDevFixProps) {
@@ -222,7 +229,7 @@ export default class DevFix extends React.Component<
         await this.refreshSolutions();
 
         this.setState({
-          page: 'admin',
+          page: this.state.returnPage,
           selectedSolutionId: null,
           isAdminViewingSolution: false,
           error: ''
@@ -259,7 +266,8 @@ export default class DevFix extends React.Component<
     this.setState({
       page: 'details',
       selectedSolutionId: id,
-      isAdminViewingSolution: true
+      isAdminViewingSolution: true,
+      returnPage: 'admin'
     });
   };
 
@@ -267,7 +275,8 @@ export default class DevFix extends React.Component<
     this.setState({
       page: 'add-solution',
       selectedSolutionId: id,
-      isAdminViewingSolution: false
+      isAdminViewingSolution: false,
+      returnPage: 'admin'
     });
   };
 
@@ -396,8 +405,8 @@ export default class DevFix extends React.Component<
 
     const myContributions = currentUser
       ? this.state.solutions.filter(
-          solution => solution.Author?.Id === currentUser.id
-        ).length
+        solution => solution.Author?.Id === currentUser.id
+      ).length
       : 0;
 
     if (
@@ -421,11 +430,10 @@ export default class DevFix extends React.Component<
           <SolutionDetails
             context={this.props.context}
             solutionId={this.state.selectedSolutionId}
+
             onBack={() =>
               this.setState({
-                page: this.state.isAdminViewingSolution
-                  ? 'admin'
-                  : 'solutions',
+                page: this.state.returnPage,
                 selectedSolutionId: null,
                 isAdminViewingSolution: false
               })
@@ -480,7 +488,8 @@ export default class DevFix extends React.Component<
               this.setState({
                 page: 'details',
                 selectedSolutionId: id,
-                isAdminViewingSolution: false
+                isAdminViewingSolution: false,
+                returnPage: 'favorites'
               });
             }}
             onBack={this.handleSolutions}
@@ -520,25 +529,25 @@ export default class DevFix extends React.Component<
       const selectedSolution =
         this.state.selectedSolutionId !== null
           ? this.state.solutions.find(
-              solution =>
-                solution.Id === this.state.selectedSolutionId
-            )
+            solution =>
+              solution.Id === this.state.selectedSolutionId
+          )
           : undefined;
 
       const editSolution: IAddSolutionInput | undefined =
         selectedSolution
           ? {
-              title: selectedSolution.Title || '',
-              technology: selectedSolution.Technology || '',
-              category: selectedSolution.Category || '',
-              difficulty: selectedSolution.Difficulty || '',
-              problem: selectedSolution.Problem || '',
-              errorMessage: selectedSolution.ErrorMessage || '',
-              cause: selectedSolution.Cause || '',
-              solution: selectedSolution.Solution || '',
-              lessonLearned: selectedSolution.LessonLearned || '',
-              tags: selectedSolution.Tags || ''
-            }
+            title: selectedSolution.Title || '',
+            technology: selectedSolution.Technology || '',
+            category: selectedSolution.Category || '',
+            difficulty: selectedSolution.Difficulty || '',
+            problem: selectedSolution.Problem || '',
+            errorMessage: selectedSolution.ErrorMessage || '',
+            cause: selectedSolution.Cause || '',
+            solution: selectedSolution.Solution || '',
+            lessonLearned: selectedSolution.LessonLearned || '',
+            tags: selectedSolution.Tags || ''
+          }
           : undefined;
 
       return (
@@ -559,11 +568,12 @@ export default class DevFix extends React.Component<
             context={this.props.context}
             initialSolution={editSolution}
             isEditMode={this.state.selectedSolutionId !== null}
+
             onCancel={() =>
               this.setState({
                 page:
                   this.state.selectedSolutionId !== null
-                    ? 'admin'
+                    ? this.state.returnPage
                     : 'my-contributions',
                 selectedSolutionId: null,
                 isAdminViewingSolution: false
@@ -594,11 +604,22 @@ export default class DevFix extends React.Component<
             context={this.props.context}
             onBack={this.handleHome}
             onAddSolution={this.handleAddSolution}
+
             onViewSolution={(id: number) =>
               this.setState({
                 page: 'details',
                 selectedSolutionId: id,
-                isAdminViewingSolution: false
+                isAdminViewingSolution: false,
+                returnPage: 'my-contributions'
+              })
+            }
+
+            onEditSolution={(id: number) =>
+              this.setState({
+                page: 'add-solution',
+                selectedSolutionId: id,
+                isAdminViewingSolution: false,
+                returnPage: 'my-contributions'
               })
             }
           />
@@ -628,7 +649,9 @@ export default class DevFix extends React.Component<
               this.setState({
                 page: 'details',
                 selectedSolutionId: id,
-                isAdminViewingSolution: false
+                isAdminViewingSolution: false,
+                returnPage: 'solutions'
+
               })
             }
           />
@@ -907,7 +930,8 @@ export default class DevFix extends React.Component<
                               this.setState({
                                 page: 'details',
                                 selectedSolutionId: solution.Id,
-                                isAdminViewingSolution: false
+                                isAdminViewingSolution: false,
+                                returnPage: 'solutions'
                               });
                             }}
                           >
@@ -1020,7 +1044,8 @@ export default class DevFix extends React.Component<
                             this.setState({
                               page: 'details',
                               selectedSolutionId: solution.Id,
-                              isAdminViewingSolution: false
+                              isAdminViewingSolution: false,
+                              returnPage: 'solutions'
                             })
                           }
                         >

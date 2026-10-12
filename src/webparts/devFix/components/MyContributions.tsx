@@ -13,6 +13,7 @@ interface IMyContributionsProps {
   onBack: () => void;
   onViewSolution: (id: number) => void;
    onAddSolution: () => void;
+   onEditSolution: (id: number) => void;
 }
 
 interface IMyContributionsState {
@@ -85,9 +86,10 @@ private handleAddSolution = (): void => {
     this.props.onViewSolution(id);
   };
 
-  private handleEdit = (id: number): void => {
-    window.location.hash = `#/solutions/${id}/edit`;
-  };
+  
+private handleEdit = (id: number): void => {
+  this.props.onEditSolution(id);
+};
 
   private handleDelete = async (id: number): Promise<void> => {
     const confirmed = window.confirm(
