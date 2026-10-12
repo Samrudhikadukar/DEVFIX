@@ -1,0 +1,742 @@
+.page {
+min-height: 100%;
+background: #f8f9fc;
+padding: 48px 24px 0;
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+color: #07152d;
+box-sizing: border-box;
+}
+
+.headerSection {
+display: flex;
+justify-content: space-between;
+align-items: flex-end;
+gap: 24px;
+margin-bottom: 32px;
+}
+
+.pageTitle {
+margin: 0;
+font-size: clamp(28px, 3vw, 38px);
+line-height: 1.1;
+font-weight: 700;
+letter-spacing: -1px;
+}
+
+.pageSubtitle {
+margin: 8px 0 0;
+font-size: clamp(15px, 1.5vw, 20px);
+color: #536584;
+}
+
+.headerButtons {
+display: flex;
+gap: 10px;
+align-items: center;
+flex-wrap: nowrap;
+}
+
+.secondaryButton,
+.primaryButton {
+min-height: 44px;
+padding: 10px 20px;
+border-radius: 999px;
+font-size: 14px;
+cursor: pointer;
+transition: all 0.2s ease;
+white-space: nowrap;
+flex: 0 0 auto;
+}
+
+.secondaryButton {
+border: 1px solid #dce2ec;
+background: #ffffff;
+color: #16213a;
+}
+
+.secondaryButton:hover {
+background: #f4f6fa;
+border-color: #cbd3e1;
+transform: translateY(-1px);
+}
+
+.primaryButton {
+border: none;
+background: linear-gradient(135deg, #2563eb, #7c3aed);
+color: #ffffff;
+font-weight: 600;
+box-shadow: 0 8px 18px rgba(79, 70, 229, 0.2);
+}
+
+.primaryButton:hover {
+opacity: 0.92;
+transform: translateY(-1px);
+}
+
+.statsGrid {
+display: grid;
+grid-template-columns: repeat(2, minmax(0, 1fr));
+gap: 20px;
+margin-bottom: 50px;
+}
+
+.statCard {
+background: #ffffff;
+border: 1px solid #dfe4ed;
+border-radius: 20px;
+padding: 22px;
+min-height: 135px;
+display: flex;
+align-items: center;
+gap: 16px;
+box-sizing: border-box;
+width: 100%;
+min-width: 0;
+box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.statCard:hover {
+transform: translateY(-2px);
+box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+.resolvedCard {
+border-color: #9fc5ff;
+box-shadow: 0 10px 25px rgba(37, 99, 235, 0.1);
+}
+
+.statIcon {
+width: 56px;
+height: 56px;
+min-width: 56px;
+border-radius: 16px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.totalIcon {
+background: #e0edff;
+color: #2563eb;
+}
+
+.openIcon {
+background: #fff0c7;
+color: #d97706;
+}
+
+.resolvedIcon {
+background: #d7f8e3;
+color: #059669;
+}
+
+.usersIcon {
+background: #eee9ff;
+color: #7c3aed;
+}
+
+.statContent {
+flex: 1;
+min-width: 0;
+}
+
+.statLabel {
+font-size: 15px;
+color: #536584;
+margin-bottom: 5px;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.statNumber {
+font-size: clamp(25px, 2.5vw, 31px);
+font-weight: 700;
+line-height: 1.15;
+color: #07152d;
+}
+
+.statSmallText {
+color: #536584;
+font-size: 14px;
+margin-top: 4px;
+}
+
+.section {
+margin-bottom: 50px;
+}
+
+.sectionHeading {
+margin-bottom: 18px;
+}
+
+.sectionTitle {
+margin: 0;
+font-size: clamp(22px, 2vw, 27px);
+font-weight: 700;
+letter-spacing: -0.5px;
+}
+
+.sectionSubtitle {
+margin: 6px 0 0;
+color: #60708d;
+font-size: clamp(14px, 1.4vw, 17px);
+}
+
+.allSolutionsHeader {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 20px;
+margin-bottom: 20px;
+}
+
+.tableContainer {
+width: 100%;
+background: #ffffff;
+border: 1px solid #dfe4ed;
+border-radius: 20px;
+overflow-x: auto;
+overflow-y: hidden;
+box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+-webkit-overflow-scrolling: touch;
+}
+
+.table {
+width: 100%;
+min-width: 850px;
+border-collapse: collapse;
+table-layout: fixed;
+}
+
+.tableRow {
+transition: background 0.15s ease;
+}
+
+.tableRow:hover {
+background: #fafbfe;
+}
+
+.tableHeader,
+.tableHeaderRight {
+padding: 15px 18px;
+background: #f8f9fc;
+border-bottom: 1px solid #dfe4ed;
+color: #50617f;
+font-size: 13px;
+font-weight: 600;
+letter-spacing: 0.2px;
+white-space: nowrap;
+}
+
+.tableHeader {
+text-align: left;
+}
+
+.tableHeaderRight {
+text-align: right;
+}
+
+.solutionCell {
+padding: 18px;
+border-bottom: 1px solid #e2e6ee;
+font-size: 16px;
+font-weight: 600;
+color: #07152d;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.tableCell {
+padding: 18px;
+border-bottom: 1px solid #e2e6ee;
+font-size: 15px;
+color: #60708d;
+vertical-align: middle;
+}
+
+.authorName {
+color: #60708d;
+}
+
+.technologyBadge {
+display: inline-flex;
+align-items: center;
+max-width: 100%;
+padding: 5px 12px;
+border-radius: 999px;
+background: #e2efff;
+color: #2563eb;
+border: 1px solid #c8ddff;
+font-size: 13px;
+font-weight: 500;
+white-space: nowrap;
+}
+
+.statusBadge {
+display: inline-flex;
+align-items: center;
+gap: 5px;
+padding: 5px 11px;
+border-radius: 999px;
+font-size: 13px;
+font-weight: 500;
+white-space: nowrap;
+}
+
+.statusPublished {
+background: #d1fae5;
+color: #059669;
+border: 1px solid #a7f3d0;
+}
+
+.statusPending {
+background: #fef3c7;
+color: #d97706;
+border: 1px solid #fde68a;
+}
+
+.statusDraft {
+background: #f3f4f6;
+color: #6b7280;
+border: 1px solid #e5e7eb;
+}
+
+.statusDot {
+font-size: 9px;
+}
+
+.statusSelect {
+appearance: none;
+cursor: pointer;
+border: 0;
+border-radius: 999px;
+padding: 6px 28px 6px 12px;
+font-size: 13px;
+font-weight: 600;
+outline: none;
+background-image:
+linear-gradient(45deg, transparent 50%, currentColor 50%),
+linear-gradient(135deg, currentColor 50%, transparent 50%);
+background-position:
+calc(100% - 14px) 50%,
+calc(100% - 9px) 50%;
+background-size:
+5px 5px,
+5px 5px;
+background-repeat: no-repeat;
+}
+
+.statusSelect:focus {
+box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.statusSelectPublished {
+background-color: #d1fae5;
+color: #059669;
+}
+
+.statusSelectPending {
+background-color: #fef3c7;
+color: #d97706;
+}
+
+.statusSelectDraft {
+background-color: #f3f4f6;
+color: #6b7280;
+}
+
+.actionsCell {
+padding: 18px;
+border-bottom: 1px solid #e2e6ee;
+text-align: right;
+white-space: nowrap;
+}
+
+.iconButton {
+width: 34px;
+height: 34px;
+border: none;
+background: transparent;
+color: #60708d;
+cursor: pointer;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+border-radius: 8px;
+margin-left: 4px;
+transition: all 0.15s ease;
+}
+
+.iconButton:hover {
+background: #f0f2f7;
+color: #111827;
+}
+
+.deleteButton:hover {
+background: #fee2e2;
+color: #dc2626;
+}
+
+.emptyCell {
+text-align: center;
+padding: 40px 20px;
+color: #6b7890;
+font-size: 15px;
+}
+
+.tabs {
+display: flex;
+align-items: center;
+gap: 4px;
+background: #f0f2f7;
+border-radius: 999px;
+padding: 5px;
+max-width: 100%;
+overflow-x: auto;
+scrollbar-width: none;
+-webkit-overflow-scrolling: touch;
+}
+
+.tabs::-webkit-scrollbar {
+display: none;
+}
+
+.tab {
+flex-shrink: 0;
+border: none;
+background: transparent;
+color: #52617c;
+padding: 9px 17px;
+border-radius: 999px;
+font-size: 14px;
+cursor: pointer;
+white-space: nowrap;
+transition: all 0.15s ease;
+}
+
+.tab:hover {
+color: #111827;
+background: rgba(255, 255, 255, 0.6);
+}
+
+.activeTab {
+background: #ffffff;
+color: #111827;
+box-shadow: 0 2px 7px rgba(15, 23, 42, 0.1);
+}
+
+.technologySection {
+margin-bottom: 45px;
+}
+
+.technologyCard {
+margin-top: 20px;
+background: #ffffff;
+border: 1px solid #dfe4ed;
+border-radius: 20px;
+padding: 26px 30px;
+display: grid;
+grid-template-columns: repeat(2, minmax(0, 1fr));
+column-gap: 50px;
+row-gap: 22px;
+box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+}
+
+.technologyRow {
+display: flex;
+align-items: center;
+gap: 16px;
+min-width: 0;
+}
+
+.techNameArea {
+width: 160px;
+min-width: 160px;
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.techIcon {
+width: 40px;
+height: 40px;
+min-width: 40px;
+border-radius: 12px;
+background: #e2efff;
+color: #2563eb;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.techName {
+font-size: 15px;
+font-weight: 600;
+color: #111827;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.progressArea {
+flex: 1;
+min-width: 0;
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.progressTrack {
+flex: 1;
+height: 8px;
+background: #edf0f6;
+border-radius: 999px;
+overflow: hidden;
+}
+
+.progressBar {
+height: 100%;
+background: linear-gradient(90deg, #2563eb, #7c3aed);
+border-radius: 999px;
+transition: width 0.3s ease;
+}
+
+.techCount {
+width: 24px;
+color: #536584;
+font-size: 14px;
+text-align: right;
+}
+
+.footer {
+border-top: 1px solid #dfe4ed;
+margin-top: 20px;
+padding: 26px 0;
+text-align: center;
+color: #65738c;
+font-size: 14px;
+}
+
+@media (max-width: 1200px) {
+.page {
+padding-left: 20px;
+padding-right: 20px;
+}
+
+.technologyCard {
+grid-template-columns: 1fr;
+}
+}
+
+@media (max-width: 900px) {
+.headerSection {
+align-items: flex-start;
+flex-direction: column;
+}
+
+.headerButtons {
+width: 100%;
+flex-wrap: nowrap;
+overflow-x: auto;
+scrollbar-width: none;
+-webkit-overflow-scrolling: touch;
+}
+
+.headerButtons::-webkit-scrollbar {
+display: none;
+}
+
+.headerButtons .secondaryButton,
+.headerButtons .primaryButton {
+flex: 0 0 auto;
+width: auto;
+}
+
+.allSolutionsHeader {
+align-items: flex-start;
+flex-direction: column;
+}
+
+.tabs {
+width: 100%;
+}
+
+.tableContainer {
+border-radius: 16px;
+}
+
+.technologyCard {
+padding: 22px;
+}
+}
+
+@media (max-width: 650px) {
+.page {
+padding: 28px 14px 0;
+}
+
+.headerSection {
+margin-bottom: 26px;
+}
+
+.pageTitle {
+font-size: 29px;
+}
+
+.pageSubtitle {
+font-size: 15px;
+line-height: 1.5;
+}
+
+.headerButtons {
+display: flex;
+width: 100%;
+flex-wrap: nowrap;
+overflow-x: auto;
+}
+
+.headerButtons .secondaryButton,
+.headerButtons .primaryButton {
+width: auto;
+padding: 10px 18px;
+font-size: 14px;
+}
+
+.statsGrid {
+grid-template-columns: 1fr;
+gap: 14px;
+margin-bottom: 38px;
+}
+
+.statCard {
+min-height: 112px;
+padding: 18px;
+border-radius: 17px;
+}
+
+.statIcon {
+width: 48px;
+height: 48px;
+min-width: 48px;
+border-radius: 14px;
+}
+
+.statNumber {
+font-size: 27px;
+}
+
+.section {
+margin-bottom: 38px;
+}
+
+.sectionTitle {
+font-size: 22px;
+}
+
+.sectionSubtitle {
+font-size: 14px;
+}
+
+.table {
+min-width: 760px;
+}
+
+.tableHeader,
+.tableHeaderRight {
+padding: 13px 14px;
+font-size: 12px;
+}
+
+.solutionCell,
+.tableCell,
+.actionsCell {
+padding: 14px;
+font-size: 14px;
+}
+
+.technologyCard {
+padding: 18px;
+row-gap: 18px;
+}
+
+.technologyRow {
+gap: 10px;
+}
+
+.techNameArea {
+width: 120px;
+min-width: 120px;
+}
+
+.techName {
+font-size: 14px;
+}
+
+.techIcon {
+width: 36px;
+height: 36px;
+min-width: 36px;
+}
+
+.progressArea {
+gap: 8px;
+}
+
+.footer {
+padding: 22px 0;
+}
+}
+
+@media (max-width: 420px) {
+.page {
+padding-left: 10px;
+padding-right: 10px;
+}
+
+.headerButtons {
+width: 100%;
+flex-wrap: nowrap;
+overflow-x: auto;
+}
+
+.headerButtons .secondaryButton,
+.headerButtons .primaryButton {
+width: auto;
+flex: 0 0 auto;
+}
+
+.statCard {
+padding: 16px;
+}
+
+.statLabel {
+font-size: 14px;
+}
+
+.technologyCard {
+padding: 15px;
+}
+
+.techNameArea {
+width: 105px;
+min-width: 105px;
+}
+
+.techName {
+font-size: 13px;
+}
+
+.tabs {
+border-radius: 999px;
+}
+
+.tab {
+padding: 8px 13px;
+font-size: 13px;
+}
+}
+
+

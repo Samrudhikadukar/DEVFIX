@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "dev-fix-client-side-solution",
+    "id": "7562922f-6641-4bd9-9d7f-10616c2eaed7",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.23.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "DevFix description"
+      },
+      "longDescription": {
+        "default": "DevFix description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "dev-fix Feature",
+        "description": "The feature that activates elements of the dev-fix solution.",
+        "id": "b75eca39-3448-49a8-bfd3-df23df2c0dea",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/dev-fix.sppkg"
+  }
+}

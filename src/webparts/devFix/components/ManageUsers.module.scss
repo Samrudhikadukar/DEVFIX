@@ -1,0 +1,211 @@
+.manageUsers {
+  width: 100%;
+  padding: 32px 40px;
+  box-sizing: border-box;
+  background: #f8f9fb;
+  min-height: calc(100vh - 64px);
+}
+
+/* Header */
+
+.headerSection {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.headerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.pageSubtitle {
+  margin: 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Back Button */
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.backButton:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Table Container */
+
+.tableContainer {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Table */
+
+.usersTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.usersTable thead {
+  background: #f8fafc;
+}
+
+.usersTable th {
+  padding: 14px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.usersTable th:last-child {
+  text-align: right;
+}
+
+.usersTable td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #eef0f2;
+  color: #374151;
+  vertical-align: middle;
+}
+
+.usersTable tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.usersTable tbody tr:hover {
+  background: #f8fafc;
+}
+
+.usersTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* User */
+
+.userName {
+  color: #111827;
+  font-weight: 600;
+}
+
+/* Email */
+
+.email {
+  color: #6b7280;
+}
+
+/* Role */
+
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.adminBadge {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.userBadge {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+/* Solutions */
+
+.solutionCount {
+  text-align: right;
+  color: #111827;
+  font-family: monospace;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Loading / Error / Empty */
+
+.message {
+  padding: 48px 20px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.errorMessage {
+  padding: 48px 20px;
+  text-align: center;
+  color: #dc2626;
+  font-size: 14px;
+}
+
+.emptyMessage {
+  padding: 48px 20px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Responsive */
+
+@media screen and (max-width: 768px) {
+  .manageUsers {
+    padding: 24px 16px;
+  }
+
+  .headerSection {
+    flex-direction: column;
+  }
+
+  .backButton {
+    width: fit-content;
+  }
+
+  .tableContainer {
+    overflow-x: auto;
+  }
+
+  .usersTable {
+    min-width: 650px;
+  }
+
+  .pageTitle {
+    font-size: 24px;
+  }
+}

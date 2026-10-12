@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "dev-fix-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/devFix/DevFixWebPart.js",
+          "manifest": "./src/webparts/devFix/DevFixWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "DevFixWebPartStrings": "lib/webparts/devFix/loc/{locale}.js"
+  }
+}
