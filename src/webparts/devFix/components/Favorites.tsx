@@ -41,9 +41,9 @@ export default class Favorites extends React.Component<
     };
   }
 
-  public componentDidMount(): void {
-    this.loadFavorites();
-  }
+ public componentDidMount(): void {
+  void this.loadFavorites();
+}
 
   private async loadFavorites(): Promise<void> {
     try {

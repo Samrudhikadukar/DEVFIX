@@ -1,25 +1,38 @@
+/* =========================================================
+   DevFix — Home Page
+   Fluent UI + Lovable-style visual system
+   ========================================================= */
+
 .devFix {
-  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
   background: #f8fafc;
-  color: #111827;
-  font-family: Arial, sans-serif;
+  color: #0f172a;
+
+  container-type: inline-size;
+  container-name: devfix;
+}
+
+.devFix *,
+.devFix *::before,
+.devFix *::after {
+  box-sizing: border-box;
 }
 
 /* =========================
    HERO
-========================= */
+   ========================= */
 
 .hero {
-  background: linear-gradient(
-    135deg,
-    #eef2ff 0%,
-    #ffffff 50%,
-    #f5f3ff 100%
-  );
+  background: linear-gradient(135deg, #eef2ff 0%, #ffffff 50%, #f5f3ff 100%);
   border-bottom: 1px solid #e5e7eb;
 }
 
 .heroContent {
+  width: 100%;
   max-width: 900px;
   margin: 0 auto;
   padding: 70px 20px;
@@ -29,21 +42,28 @@
 .heroBadge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: 7px;
+  padding: 7px 13px;
   border: 1px solid #c7d2fe;
   border-radius: 999px;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.92);
   color: #6366f1;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.06);
+}
+
+.heroBadge i {
+  font-size: 13px;
 }
 
 .hero h1 {
   margin: 20px 0 0;
   font-size: 52px;
   font-weight: 800;
+  line-height: 1.1;
   letter-spacing: -1.5px;
+  overflow-wrap: anywhere;
 }
 
 .hero h1 span {
@@ -59,10 +79,11 @@
 }
 
 /* =========================
-   SEARCH
-========================= */
+   SEARCH + FILTERS
+   ========================= */
 
 .searchContainer {
+  width: 100%;
   max-width: 760px;
   margin: 30px auto 0;
 }
@@ -70,43 +91,50 @@
 .searchInputWrapper {
   position: relative;
   width: 100%;
-}
-
-.searchInputWrapper input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 16px 18px 16px 48px;
+  min-width: 0;
+  overflow: hidden;
   border: 1px solid #e2e8f0;
   border-radius: 16px;
   background: #ffffff;
-  color: #111827;
-  font-size: 16px;
-  outline: none;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
-.searchInputWrapper input::placeholder {
-  color: #94a3b8;
-}
-
-.searchInputWrapper input:focus {
+.searchInputWrapper:focus-within {
   border-color: #6366f1;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
-.searchIcon {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 15px;
-  pointer-events: none;
-  color: #64748b;
+.searchInputWrapper :global(.ms-TextField) {
+  width: 100%;
 }
 
-/* =========================
-   FILTERS
-========================= */
+.searchInputWrapper :global(.ms-TextField-fieldGroup) {
+  min-height: 54px;
+  border: 0;
+  background: transparent;
+}
+
+.searchInputWrapper :global(.ms-TextField-field) {
+  height: 54px;
+  padding: 0 18px 0 48px;
+  color: #111827;
+  font-size: 16px;
+}
+
+.searchInputWrapper :global(.ms-TextField-field::placeholder) {
+  color: #94a3b8;
+}
+
+.searchIcon {
+  position: absolute;
+  z-index: 2;
+  left: 17px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  font-size: 16px;
+  pointer-events: none;
+}
 
 .filterBar {
   display: flex;
@@ -117,75 +145,68 @@
   flex-wrap: wrap;
 }
 
-.filterBar select {
-  width: auto;
+.filterDropdown {
   min-width: 150px;
+}
+
+.filterDropdown :global(.ms-Dropdown-title) {
   height: 38px;
-  padding: 0 12px;
+  padding: 0 32px 0 12px;
+  display: flex;
+  align-items: center;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   background: #ffffff;
   color: #475569;
-  font-family: Arial, sans-serif;
   font-size: 14px;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
 }
 
-.filterBar select:hover {
+.filterDropdown :global(.ms-Dropdown-title:hover) {
   border-color: #cbd5e1;
 }
 
-.filterBar select:focus {
+.filterDropdown :global(.ms-Dropdown-title:focus) {
   border-color: #6366f1;
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
 }
 
 .clearFilters {
+  min-width: auto;
   height: 38px;
-  padding: 0 12px;
-  border: none;
+  border: 0;
   border-radius: 8px;
   background: transparent;
   color: #64748b;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
 }
 
-.clearFilters:hover:not(:disabled) {
+.clearFilters:hover {
   background: #f1f5f9;
   color: #111827;
 }
 
-.clearFilters:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
 /* =========================
    MAIN
-========================= */
+   ========================= */
 
 .mainContainer {
+  width: 100%;
   max-width: 1280px;
+  min-width: 0;
   margin: 0 auto;
   padding: 40px 20px 70px;
+  overflow: hidden;
 }
 
 /* =========================
    STATS
-========================= */
+   ========================= */
 
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 16px;
+  width: 100%;
+  min-width: 0;
   margin-bottom: 55px;
 }
 
@@ -193,12 +214,13 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  min-width: 0;
   padding: 20px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 14px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
-  transition: 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .statCard:hover {
@@ -206,18 +228,17 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
 }
 
-.statCard svg {
-  width: 24px;
-  height: 24px;
-  color: #6366f1;
+.statCard i {
   flex-shrink: 0;
+  color: #6366f1;
+  font-size: 24px;
 }
 
 .statCard span {
   display: block;
+  margin-bottom: 5px;
   color: #64748b;
   font-size: 12px;
-  margin-bottom: 5px;
 }
 
 .statCard strong {
@@ -228,23 +249,30 @@
 
 /* =========================
    SECTIONS
-========================= */
+   ========================= */
 
 .section {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   margin-bottom: 55px;
+  overflow: hidden;
 }
 
 .sectionHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   margin-bottom: 22px;
+  flex-wrap: wrap;
 }
 
 .sectionHeader h2 {
   margin: 0;
   font-size: 22px;
   font-weight: 800;
+  line-height: 1.25;
 }
 
 .sectionHeader p {
@@ -253,48 +281,46 @@
   font-size: 13px;
 }
 
-.sectionHeader button {
-  border: none;
-  background: transparent;
+.browseButton {
+  min-width: 112px;
+  border: 1px solid #e0e7ff;
+  border-radius: 9px;
+  background: #ffffff;
   color: #6366f1;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
 }
 
-.sectionHeader button:hover {
-  color: #4f46e5;
+.browseButton:hover {
+  border-color: #c7d2fe;
+  background: #eef2ff;
 }
 
 /* =========================
    SOLUTION GRID
-========================= */
+   ========================= */
 
 .solutionGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 24px;
+  width: 100%;
+  min-width: 0;
 }
 
 .solutionCard {
+  min-width: 0;
   padding: 20px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 14px;
-  transition: 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   cursor: pointer;
-  min-width: 0;
 }
 
 .solutionCard:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   border-color: #c7d2fe;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
-
-/* =========================
-   CARD TOP
-========================= */
 
 .cardTop {
   display: flex;
@@ -311,28 +337,8 @@
   min-width: 0;
 }
 
-.techBadge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 9px;
-  border-radius: 999px;
-  background: #eef2ff;
-  color: #6366f1;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.categoryBadge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 9px;
-  border-radius: 999px;
-  background: #f3e8ff;
-  color: #7c3aed;
-  font-size: 11px;
-  font-weight: 700;
-}
-
+.techBadge,
+.categoryBadge,
 .easy,
 .medium,
 .hard {
@@ -342,6 +348,16 @@
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
+}
+
+.techBadge {
+  background: #eef2ff;
+  color: #6366f1;
+}
+
+.categoryBadge {
+  background: #f3e8ff;
+  color: #7c3aed;
 }
 
 .easy {
@@ -360,30 +376,20 @@
 }
 
 .favoriteButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  flex-shrink: 0;
   width: 34px;
   height: 34px;
-  padding: 0;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #ffffff;
   color: #64748b;
-  font-size: 15px;
-  cursor: pointer;
-  transition: 0.2s ease;
-  flex-shrink: 0;
 }
 
 .favoriteButton:hover {
   border-color: #fbbf24;
   background: #fffbeb;
+  color: #d97706;
 }
-
-/* =========================
-   CARD CONTENT
-========================= */
 
 .solutionCard h3 {
   margin: 18px 0 8px;
@@ -393,20 +399,15 @@
 }
 
 .solutionCard p {
+  display: -webkit-box;
   margin: 0;
+  overflow: hidden;
   color: #64748b;
   font-size: 13px;
   line-height: 1.6;
-
-  display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
-  overflow: hidden;
 }
-
-/* =========================
-   TAGS
-========================= */
 
 .tags {
   display: flex;
@@ -424,10 +425,6 @@
   font-size: 11px;
 }
 
-/* =========================
-   CARD ACTIONS
-========================= */
-
 .cardActions {
   display: flex;
   align-items: center;
@@ -439,58 +436,53 @@
 }
 
 .helpfulButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 10px;
+  min-width: 48px;
+  height: 32px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #ffffff;
   color: #64748b;
-  font-size: 12px;
-  cursor: pointer;
 }
 
 .helpfulButton:hover {
-  color: #6366f1;
   border-color: #c7d2fe;
   background: #eef2ff;
+  color: #6366f1;
 }
 
 .viewSolutionButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  border: none;
+  border: 0;
   background: transparent;
   color: #6366f1;
-  font-size: 13px;
   font-weight: 700;
-  cursor: pointer;
 }
 
 .viewSolutionButton:hover {
+  background: #eef2ff;
   color: #4f46e5;
 }
 
 /* =========================
    TECHNOLOGIES
-========================= */
+   ========================= */
 
 .techGrid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 14px;
+  width: 100%;
+  min-width: 0;
 }
 
 .technologyCard {
+  min-width: 0;
   padding: 20px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   cursor: pointer;
-  transition: 0.2s ease;
   text-align: left;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .technologyCard:hover {
@@ -500,11 +492,11 @@
 }
 
 .techIcon {
-  width: 40px;
-  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 40px;
+  height: 40px;
   margin-bottom: 12px;
   border-radius: 11px;
   background: #6366f1;
@@ -513,8 +505,8 @@
 
 .technologyCard strong {
   display: block;
-  font-size: 14px;
   margin-bottom: 6px;
+  font-size: 14px;
 }
 
 .technologyCard span {
@@ -524,25 +516,28 @@
 
 /* =========================
    BOTTOM SECTIONS
-========================= */
+   ========================= */
 
 .bottomGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 35px;
+  min-width: 0;
 }
 
 .listCard {
+  min-width: 0;
+  overflow: hidden;
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 14px;
-  overflow: hidden;
 }
 
 .listItem {
   display: flex;
   align-items: center;
   gap: 15px;
+  min-width: 0;
   padding: 16px 18px;
   border-bottom: 1px solid #f1f5f9;
 }
@@ -552,10 +547,10 @@
 }
 
 .listItem > strong {
+  flex-shrink: 0;
   width: 28px;
   color: #94a3b8;
   font-size: 13px;
-  flex-shrink: 0;
 }
 
 .listItem > div {
@@ -565,6 +560,7 @@
 
 .listItem h4 {
   margin: 0 0 5px;
+  overflow-wrap: anywhere;
   font-size: 13px;
   font-weight: 700;
 }
@@ -575,23 +571,29 @@
 }
 
 .listItem b {
+  flex-shrink: 0;
   color: #6366f1;
   font-size: 12px;
   white-space: nowrap;
 }
 
 .recentViewButton {
-  border: none;
+  flex-shrink: 0;
+  min-width: 54px;
+  border: 0;
   background: transparent;
   color: #6366f1;
   font-size: 12px;
   font-weight: 600;
-  cursor: pointer;
+}
+
+.recentViewButton:hover {
+  background: #eef2ff;
 }
 
 /* =========================
    EMPTY / ERROR / LOADING
-========================= */
+   ========================= */
 
 .emptyState,
 .message {
@@ -605,185 +607,90 @@
 
 /* =========================
    RESPONSIVE
-========================= */
+   ========================= */
+
+/* These rules use both viewport breakpoints and auto-fit grids.
+   The auto-fit rules are important for SharePoint mobile preview,
+   where the web part can be narrow even when the browser viewport is wide. */
 
 @media screen and (max-width: 1000px) {
-
   .statsGrid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   }
 
   .solutionGrid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   }
 
   .techGrid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
 
   .bottomGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media screen and (max-width: 700px) {
-
   .heroContent {
-    padding: 55px 20px;
+    padding: 45px 16px;
   }
 
   .hero h1 {
-    font-size: 42px;
+    font-size: clamp(30px, 7vw, 42px);
+    letter-spacing: -0.8px;
   }
 
   .hero p {
     font-size: 15px;
   }
 
-  .searchContainer {
-    max-width: 100%;
-  }
-
   .filterBar {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .filterBar select,
-  .clearFilters {
     width: 100%;
   }
 
+  .filterDropdown,
+  .clearFilters {
+    width: 100%;
+    max-width: 100%;
+  }
+
   .mainContainer {
+    width: 100%;
+    max-width: 100%;
     padding: 30px 15px 50px;
-  }
-
-  .statsGrid,
-  .solutionGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .techGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .sectionHeader {
-    align-items: flex-start;
-  }
-}
-
-@media screen and (max-width: 450px) {
-
-  .hero h1 {
-    font-size: 36px;
-  }
-
-  .techGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .cardActions {
-    flex-wrap: wrap;
-  }
-
-  
-.devFix {
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  overflow-wrap: anywhere;
-}
-
-.devFix *,
-.devFix *::before,
-.devFix *::after {
-  box-sizing: border-box;
-}
-
-.hero,
-.heroContent,
-.mainContainer,
-.searchContainer,
-.section,
-.statsGrid,
-.solutionGrid,
-.techGrid,
-.bottomGrid {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.hero h1 {
-  overflow-wrap: anywhere;
-}
-
-.searchInputWrapper,
-.searchInputWrapper input {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.solutionGrid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.statsGrid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.techGrid {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-.solutionCard,
-.statCard,
-.technologyCard,
-.listCard {
-  min-width: 0;
-}
-
-.sectionHeader {
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-@media screen and (max-width: 1000px) {
-  .solutionGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .techGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .statsGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media screen and (max-width: 700px) {
-  .heroContent {
-    padding: 40px 16px;
-  }
-
-  .hero h1 {
-    font-size: clamp(28px, 7vw, 42px);
-    letter-spacing: -0.8px;
-  }
-
-  .mainContainer {
-    padding: 24px 12px 40px;
   }
 
   .statsGrid,
   .solutionGrid,
   .techGrid,
   .bottomGrid {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .statsGrid {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .sectionHeader {
-    align-items: flex-start;
+  .solutionGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .techGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .statCard,
+  .solutionCard,
+  .technologyCard,
+  .listCard {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
   }
 
   .statCard {
@@ -794,6 +701,21 @@
     padding: 16px;
   }
 
+  .sectionHeader {
+    align-items: flex-start;
+  }
+
+  .sectionHeader h2,
+  .sectionHeader p {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .browseButton {
+    width: auto;
+    max-width: 100%;
+  }
+
   .emptyState,
   .message {
     padding: 24px 16px;
@@ -802,27 +724,78 @@
 
 @media screen and (max-width: 450px) {
   .heroContent {
+    width: 100%;
+    max-width: 100%;
     padding: 32px 12px;
   }
 
   .hero h1 {
     font-size: 30px;
+    overflow-wrap: anywhere;
   }
 
   .hero p {
     font-size: 14px;
+    overflow-wrap: anywhere;
   }
 
   .mainContainer {
-    padding-right: 10px;
-    padding-left: 10px;
+    padding: 24px 10px 40px;
+  }
+
+  .statsGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    margin-bottom: 38px;
+  }
+
+  .solutionGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .techGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .bottomGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
   }
 
   .cardTop {
+    width: 100%;
+    min-width: 0;
     flex-wrap: wrap;
   }
 
+  .cardBadges {
+    max-width: calc(100% - 44px);
+  }
+
+  .solutionCard h3 {
+    font-size: 16px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .solutionCard p {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .tags {
+    max-width: 100%;
+  }
+
+  .tag {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
   .cardActions {
+    width: 100%;
     flex-wrap: wrap;
   }
 
@@ -830,5 +803,116 @@
   .viewSolutionButton {
     max-width: 100%;
   }
+
+  .searchInputWrapper {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .searchInputWrapper :global(.ms-TextField-field) {
+    min-width: 0;
+    font-size: 14px;
+  }
+
+  .listItem {
+    gap: 10px;
+    padding: 14px 12px;
+  }
+
+  .listItem h4 {
+    overflow-wrap: anywhere;
+  }
 }
+
+/* Extra protection for narrow SharePoint web-part containers. */
+@media screen and (max-width: 360px) {
+  .mainContainer {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  .techGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sectionHeader {
+    gap: 10px;
+  }
+
+  .sectionHeader h2 {
+    font-size: 20px;
+  }
+
+  .statCard {
+    gap: 12px;
+  }
+}
+
+/* ================================
+   SPFX MOBILE WEB-PART FIX
+   ================================ */
+
+@container devfix (max-width: 760px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .solutionGrid {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .techGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .bottomGrid {
+    grid-template-columns: 1fr;
+    width: 100%;
+    gap: 22px;
+  }
+
+  .statCard,
+  .solutionCard,
+  .technologyCard,
+  .listCard {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .solutionCard h3,
+  .solutionCard p,
+  .listItem h4 {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .listItem > div {
+    min-width: 0;
+  }
+}
+
+@container devfix (max-width: 450px) {
+  .mainContainer {
+    padding: 24px 10px 40px;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .solutionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .techGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .bottomGrid {
+    grid-template-columns: 1fr;
+  }
 }

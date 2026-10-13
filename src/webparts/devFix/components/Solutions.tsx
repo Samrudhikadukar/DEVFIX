@@ -76,11 +76,13 @@ export default class Solutions extends React.Component<
 
   public async componentDidMount(): Promise<void> {
     try {
-      const solutions = await this.sharePointService.getSolutions();
+      const solutions =
+        await this.sharePointService.getSolutions();
 
       this.setState({
         solutions: solutions as ISolution[],
-        loading: false
+        loading: false,
+        error: ''
       });
     } catch (error) {
       console.error('Error loading solutions:', error);
@@ -195,17 +197,26 @@ export default class Solutions extends React.Component<
 
     const technologyOptions: IDropdownOption[] = [
       { key: '', text: 'All Technologies' },
-      ...technologies.map(item => ({ key: item, text: item }))
+      ...technologies.map(item => ({
+        key: item,
+        text: item
+      }))
     ];
 
     const categoryOptions: IDropdownOption[] = [
       { key: '', text: 'All Categories' },
-      ...categories.map(item => ({ key: item, text: item }))
+      ...categories.map(item => ({
+        key: item,
+        text: item
+      }))
     ];
 
     const difficultyOptions: IDropdownOption[] = [
       { key: '', text: 'All Difficulties' },
-      ...difficulties.map(item => ({ key: item, text: item }))
+      ...difficulties.map(item => ({
+        key: item,
+        text: item
+      }))
     ];
 
     const hasActiveFilters = Boolean(
@@ -215,7 +226,7 @@ export default class Solutions extends React.Component<
     return (
       <section className={styles.solutionsPage}>
         {/* HEADER */}
-        <div className={styles.header}>
+        <header className={styles.header}>
           <DefaultButton
             className={styles.backButton}
             text="Back to Home"
@@ -223,15 +234,14 @@ export default class Solutions extends React.Component<
             onClick={this.props.onBack}
           />
 
-          <div>
-            <h1>All Solutions</h1>
-            <p>
-              Browse solutions shared by your development team.
-            </p>
-          </div>
-        </div>
+          <h1>All Solutions</h1>
 
-        {/* FILTERS */}
+          <p>
+            Browse solutions shared by your development team.
+          </p>
+        </header>
+
+        {/* SEARCH AND FILTERS */}
         <div className={styles.filterCard}>
           <div className={styles.searchBox}>
             <TextField
@@ -246,7 +256,7 @@ export default class Solutions extends React.Component<
           </div>
 
           <div className={styles.filterTitle}>
-            Filters
+            <span>Filter solutions</span>
           </div>
 
           <Dropdown
@@ -310,7 +320,10 @@ export default class Solutions extends React.Component<
         {/* ERROR */}
         {!loading && error && (
           <div className={styles.message}>
-            <MessageBar messageBarType={MessageBarType.error}>
+            <MessageBar
+              messageBarType={MessageBarType.error}
+              isMultiline={false}
+            >
               {error}
             </MessageBar>
           </div>
@@ -331,15 +344,15 @@ export default class Solutions extends React.Component<
                     key={solution.Id}
                     className={styles.solutionCard}
                   >
-                    {/* TOP */}
+                    {/* TECHNOLOGY, CATEGORY AND DIFFICULTY */}
                     <div className={styles.cardTop}>
                       <div className={styles.cardBadges}>
                         <span className={styles.techBadge}>
-                          {solution.Technology}
+                          {solution.Technology || 'Technology'}
                         </span>
 
                         <span className={styles.categoryBadge}>
-                          {solution.Category}
+                          {solution.Category || 'General'}
                         </span>
 
                         <span
@@ -347,7 +360,7 @@ export default class Solutions extends React.Component<
                             solution.Difficulty
                           )}
                         >
-                          {solution.Difficulty}
+                          {solution.Difficulty || 'N/A'}
                         </span>
                       </div>
 
@@ -358,8 +371,16 @@ export default class Solutions extends React.Component<
                             ? 'FavoriteStarFill'
                             : 'FavoriteStar'
                         }}
-                        title="Favorites"
-                        ariaLabel="Favorites"
+                        title={
+                          solution.IsFavorite
+                            ? 'Remove from favorites'
+                            : 'Add to favorites'
+                        }
+                        ariaLabel={
+                          solution.IsFavorite
+                            ? 'Remove from favorites'
+                            : 'Add to favorites'
+                        }
                         onClick={event => event?.stopPropagation()}
                       />
                     </div>
@@ -367,8 +388,11 @@ export default class Solutions extends React.Component<
                     {/* TITLE */}
                     <h3>{solution.Title}</h3>
 
-                    {/* PROBLEM */}
-                    <p>{solution.Problem}</p>
+                    {/* PROBLEM DESCRIPTION */}
+                    <p>
+                      {solution.Problem ||
+                        'No problem description available.'}
+                    </p>
 
                     {/* TAGS */}
                     <div className={styles.tags}>
@@ -377,9 +401,9 @@ export default class Solutions extends React.Component<
                         .map(tag => tag.trim())
                         .filter(Boolean)
                         .slice(0, 3)
-                        .map(tag => (
+                        .map((tag, index) => (
                           <span
-                            key={tag}
+                            key={`${solution.Id}-${tag}-${index}`}
                             className={styles.tag}
                           >
                             #{tag}
@@ -391,7 +415,7 @@ export default class Solutions extends React.Component<
                     <div className={styles.cardActions}>
                       <DefaultButton
                         className={styles.helpfulButton}
-                        text={`Helpful · ${solution.HelpfulCount}`}
+                        text={`Helpful · ${solution.HelpfulCount || 0}`}
                         iconProps={{ iconName: 'Like' }}
                         onClick={event => event?.stopPropagation()}
                       />
@@ -400,10 +424,9 @@ export default class Solutions extends React.Component<
                         className={styles.viewSolutionButton}
                         text="View Solution"
                         iconProps={{ iconName: 'Forward' }}
-                        onClick={event => {
-                          event?.stopPropagation();
-                          this.props.onViewSolution(solution.Id);
-                        }}
+                        onClick={() =>
+                          this.props.onViewSolution(solution.Id)
+                        }
                       />
                     </div>
                   </article>
@@ -411,7 +434,18 @@ export default class Solutions extends React.Component<
               </div>
             ) : (
               <div className={styles.emptyState}>
-                No solutions found.
+                <h3>No solutions found</h3>
+                <p>
+                  Try changing your search or clearing the filters.
+                </p>
+
+                {hasActiveFilters && (
+                  <DefaultButton
+                    text="Clear all filters"
+                    iconProps={{ iconName: 'ClearFilter' }}
+                    onClick={this.clearFilters}
+                  />
+                )}
               </div>
             )}
           </>
@@ -420,4 +454,3 @@ export default class Solutions extends React.Component<
     );
   }
 }
-

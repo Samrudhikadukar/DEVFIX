@@ -1,3 +1,4 @@
+
 .solutionsPage {
   width: 100%;
   min-height: calc(100vh - 64px);
@@ -33,32 +34,29 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  border: none;
-  background: linear-gradient(135deg, #7c3aed, #6366f1);
-  color: #ffffff;
+  gap: 8px;
   min-height: 40px;
   padding: 9px 16px;
+  border: none;
   border-radius: 999px;
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  color: #fff;
   font-size: 13px;
   font-weight: 600;
-  cursor: pointer;
   white-space: nowrap;
+  cursor: pointer;
   box-shadow: 0 5px 14px rgba(124, 58, 237, 0.18);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    opacity 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .addSolutionButton:hover {
-  opacity: 0.94;
   transform: translateY(-1px);
   box-shadow: 0 7px 18px rgba(124, 58, 237, 0.24);
 }
 
-.addSolutionButton:active {
-  transform: translateY(0);
+.addSolutionButton:focus-visible {
+  outline: 2px solid #7c3aed;
+  outline-offset: 3px;
 }
 
 .message {
@@ -68,7 +66,7 @@
   text-align: center;
   color: #6b7280;
   font-size: 14px;
-  background: #ffffff;
+  background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
 }
@@ -78,7 +76,7 @@
   padding: 60px 20px;
   box-sizing: border-box;
   text-align: center;
-  background: #ffffff;
+  background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 14px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -99,66 +97,70 @@
 
 .contributionsTableCard {
   width: 100%;
-  background: #ffffff;
+  overflow-x: auto;
+  background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 14px;
-  overflow-x: auto;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
 }
 
-.contributionsTable {
-  width: 100%;
-  min-width: 850px;
-  border-collapse: collapse;
-  font-size: 13px;
+.detailsList {
+  min-width: 760px;
+  padding: 8px 12px 12px;
 }
 
-.contributionsTable thead {
+/* Fluent UI header */
+.detailsList :global(.ms-DetailsHeader) {
+  padding-top: 8px;
+  border-bottom: 1px solid #e5e7eb;
   background: #f8fafc;
 }
 
-.contributionsTable th {
-  padding: 14px 18px;
-  border-bottom: 1px solid #e5e7eb;
+.detailsList :global(.ms-DetailsHeader-cell) {
   color: #6b7280;
   font-size: 11px;
   font-weight: 700;
-  text-align: left;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  white-space: nowrap;
 }
 
-.contributionsTable td {
-  padding: 16px 18px;
+.detailsList :global(.ms-DetailsHeader-cell:hover) {
+  background: #f3f0ff;
+  color: #6d28d9;
+}
+
+.detailsList :global(.ms-DetailsHeader-cellTitle) {
+  padding: 0 10px;
+}
+
+/* Fluent UI rows */
+.detailsList :global(.ms-DetailsRow) {
   border-bottom: 1px solid #eef0f2;
-  color: #374151;
-  vertical-align: middle;
-}
-
-.contributionsTable tbody tr {
   transition: background-color 0.2s ease;
 }
 
-.contributionsTable tbody tr:hover {
+.detailsList :global(.ms-DetailsRow:hover) {
   background: #faf9ff;
 }
 
-.contributionsTable tbody tr:last-child td {
+.detailsList :global(.ms-DetailsRow-cell) {
+  display: flex;
+  align-items: center;
+  padding: 12px 10px;
+  color: #374151;
+  font-size: 13px;
+}
+
+.detailsList :global(.ms-DetailsRow:last-child) {
   border-bottom: none;
 }
 
 .solutionTitleCell {
-  min-width: 210px;
-  max-width: 300px;
-}
-
-.solutionTitleCell span {
-  display: block;
   color: #111827;
   font-size: 13px;
   font-weight: 600;
   line-height: 20px;
+  overflow-wrap: anywhere;
 }
 
 .tableTechBadge {
@@ -174,8 +176,8 @@
 }
 
 .tableMutedText {
-  color: #6b7280 !important;
-  white-space: nowrap;
+  color: #6b7280;
+  font-size: 12px;
 }
 
 .published,
@@ -206,46 +208,37 @@
   color: #4b5563;
 }
 
-.actionsHeader {
-  text-align: center !important;
-}
-
 .tableActions {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 5px;
 }
 
 .tableIconButton {
-  width: 32px;
-  height: 32px;
   display: inline-flex;
+  width: 30px;
+  height: 30px;
   align-items: center;
   justify-content: center;
   padding: 0;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  background: #ffffff;
+  background: #fff;
   color: #6b7280;
   cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
+  transition: background-color 0.2s ease,
+    color 0.2s ease, border-color 0.2s ease;
 }
 
 .tableIconButton:hover {
-  background: #f5f3ff;
   border-color: #c4b5fd;
+  background: #f5f3ff;
   color: #7c3aed;
-  transform: translateY(-1px);
 }
 
 .tableIconButton:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.14);
+  outline: 2px solid #7c3aed;
+  outline-offset: 2px;
 }
 
 @media (max-width: 900px) {
@@ -255,11 +248,6 @@
 
   .contributionsHeader h1 {
     font-size: 25px;
-  }
-
-  .contributionsTable th,
-  .contributionsTable td {
-    padding: 13px 15px;
   }
 }
 
@@ -281,12 +269,6 @@
 
   .contributionsHeader p {
     font-size: 13px;
-  }
-
-  .addSolutionButton {
-    width: auto;
-    min-height: 38px;
-    padding: 9px 15px;
   }
 
   .contributionsTableCard {

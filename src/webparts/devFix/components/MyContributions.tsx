@@ -1,7 +1,13 @@
 
 import * as React from "react";
 import { WebPartContext } from "@microsoft/sp-webpart-base";
-import { Icon } from "@fluentui/react";
+import {
+  Icon,
+  DetailsList,
+  DetailsListLayoutMode,
+  SelectionMode,
+  IColumn
+} from "@fluentui/react";
 
 import { SharePointService } from "../services/SharePointService";
 import { UserService, ICurrentUser } from "../services/UserService";
@@ -21,6 +27,8 @@ interface IMyContributionsState {
   loading: boolean;
   error: string;
   currentUser: ICurrentUser | null;
+  sortField: string;
+  isSortedDescending: boolean;
 }
 
 export default class MyContributions extends React.Component<
@@ -40,7 +48,9 @@ export default class MyContributions extends React.Component<
       solutions: [],
       loading: true,
       error: "",
-      currentUser: null
+      currentUser: null,
+      sortField: "",
+      isSortedDescending: false
     };
   }
 
@@ -120,13 +130,10 @@ export default class MyContributions extends React.Component<
     switch (status) {
       case "Published":
         return styles.published;
-
       case "Pending Review":
         return styles.pending;
-
       case "Draft":
         return styles.draft;
-
       default:
         return styles.draft;
     }
@@ -144,15 +151,195 @@ export default class MyContributions extends React.Component<
     });
   }
 
+  private handleColumnClick = (
+    _event?: React.MouseEvent<HTMLElement>,
+    column?: IColumn
+  ): void => {
+    if (!column || !column.fieldName) {
+      return;
+    }
+
+    this.setState(prevState => ({
+      sortField: column.fieldName as string,
+      isSortedDescending:
+        prevState.sortField === column.fieldName
+          ? !prevState.isSortedDescending
+          : false
+    }));
+  };
+
+  private getColumns(): IColumn[] {
+    const { sortField, isSortedDescending } = this.state;
+
+    return [
+      {
+        key: "Title",
+        name: "Solution",
+        fieldName: "Title",
+        minWidth: 180,
+        maxWidth: 360,
+        isResizable: true,
+        isSorted: sortField === "Title",
+        isSortedDescending,
+        onColumnClick: this.handleColumnClick,
+        onRender: (item: any) => (
+          <span className={styles.solutionTitleCell}>
+            {item.Title}
+          </span>
+        )
+      },
+      {
+        key: "Technology",
+        name: "Technology",
+        fieldName: "Technology",
+        minWidth: 100,
+        maxWidth: 180,
+        isResizable: true,
+        isSorted: sortField === "Technology",
+        isSortedDescending,
+        onColumnClick: this.handleColumnClick,
+        onRender: (item: any) => (
+          <span className={styles.tableTechBadge}>
+            {item.Technology}
+          </span>
+        )
+      },
+      {
+        key: "Category",
+        name: "Category",
+        fieldName: "Category",
+        minWidth: 100,
+        maxWidth: 220,
+        isResizable: true,
+        isSorted: sortField === "Category",
+        isSortedDescending,
+        onColumnClick: this.handleColumnClick,
+        onRender: (item: any) => (
+          <span className={styles.tableMutedText}>
+            {item.Category}
+          </span>
+        )
+      },
+      {
+        key: "Status",
+        name: "Status",
+        fieldName: "Status",
+        minWidth: 120,
+        maxWidth: 190,
+        isResizable: true,
+        isSorted: sortField === "Status",
+        isSortedDescending,
+        onColumnClick: this.handleColumnClick,
+        onRender: (item: any) => (
+          <span className={this.getStatusClass(item.Status)}>
+            {item.Status}
+          </span>
+        )
+      },
+      {
+        key: "Created",
+        name: "Created",
+        fieldName: "Created",
+        minWidth: 110,
+        maxWidth: 170,
+        isResizable: true,
+        isSorted: sortField === "Created",
+        isSortedDescending,
+        onColumnClick: this.handleColumnClick,
+        onRender: (item: any) => (
+          <span className={styles.tableMutedText}>
+            {this.formatDate(item.Created)}
+          </span>
+        )
+      },
+      {
+        key: "Actions",
+        name: "Actions",
+        fieldName: "Actions",
+        minWidth: 125,
+        maxWidth: 145,
+        isResizable: false,
+        onRender: (item: any) => (
+          <div className={styles.tableActions}>
+            <button
+              type="button"
+              className={styles.tableIconButton}
+              title="View"
+              aria-label="View solution"
+              onClick={() => this.handleView(Number(item.Id))}
+            >
+              <Icon iconName="View" />
+            </button>
+
+            <button
+              type="button"
+              className={styles.tableIconButton}
+              title="Edit"
+              aria-label="Edit solution"
+              onClick={() => this.handleEdit(Number(item.Id))}
+            >
+              <Icon iconName="Edit" />
+            </button>
+
+            <button
+              type="button"
+              className={styles.tableIconButton}
+              title="Delete"
+              aria-label="Delete solution"
+              onClick={() => this.handleDelete(Number(item.Id))}
+            >
+              <Icon iconName="Delete" />
+            </button>
+          </div>
+        )
+      }
+    ];
+  }
+
   public render(): React.ReactElement {
-    const { solutions, loading, error } = this.state;
+    const {
+      solutions,
+      loading,
+      error,
+      sortField,
+      isSortedDescending
+    } = this.state;
+
+    const sortedSolutions = sortField
+      ? [...solutions].sort((a: any, b: any) => {
+          const first = a[sortField];
+          const second = b[sortField];
+
+          let comparison = 0;
+
+          if (sortField === "Created") {
+            const firstDate = first
+              ? new Date(first).getTime()
+              : 0;
+            const secondDate = second
+              ? new Date(second).getTime()
+              : 0;
+
+            comparison = firstDate - secondDate;
+          } else {
+            comparison = String(first || "").localeCompare(
+              String(second || ""),
+              undefined,
+              { numeric: true, sensitivity: "base" }
+            );
+          }
+
+          return isSortedDescending
+            ? -comparison
+            : comparison;
+        })
+      : solutions;
 
     return (
       <div className={styles.solutionsPage}>
         <div className={styles.contributionsHeader}>
           <div>
             <h1>My Contributions</h1>
-
             <p>
               {solutions.length} solution
               {solutions.length === 1 ? "" : "s"} shared by you
@@ -164,16 +351,13 @@ export default class MyContributions extends React.Component<
             className={styles.addSolutionButton}
             onClick={this.handleAddSolution}
           >
-            <Icon
-              iconName="Add"
-              styles={{ root: { fontSize: 16 } }}
-            />
+            <Icon iconName="Add" />
             Add Solution
           </button>
         </div>
 
         {error && (
-          <div className={styles.message}>
+          <div className={styles.message} role="alert">
             {error}
           </div>
         )}
@@ -187,116 +371,25 @@ export default class MyContributions extends React.Component<
         {!loading && !error && solutions.length === 0 && (
           <div className={styles.emptyState}>
             <h3>No contributions yet</h3>
-
-            <p>
-              Share your first fix with the team.
-            </p>
+            <p>Share your first fix with the team.</p>
           </div>
         )}
 
         {!loading && solutions.length > 0 && (
           <div className={styles.contributionsTableCard}>
-            <table className={styles.contributionsTable}>
-              <thead>
-                <tr>
-                  <th>Solution</th>
-                  <th>Technology</th>
-                  <th>Category</th>
-                  <th>Status</th>
-                  <th>Created</th>
-                  <th className={styles.actionsHeader}>
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {solutions.map(solution => (
-                  <tr key={solution.Id}>
-                    <td className={styles.solutionTitleCell}>
-                      <span>{solution.Title}</span>
-                    </td>
-
-                    <td>
-                      <span className={styles.tableTechBadge}>
-                        {solution.Technology}
-                      </span>
-                    </td>
-
-                    <td className={styles.tableMutedText}>
-                      {solution.Category}
-                    </td>
-
-                    <td>
-                      <span
-                        className={this.getStatusClass(
-                          solution.Status
-                        )}
-                      >
-                        {solution.Status}
-                      </span>
-                    </td>
-
-                    <td className={styles.tableMutedText}>
-                      {this.formatDate(solution.Created)}
-                    </td>
-
-                    <td>
-                      <div className={styles.tableActions}>
-                        <button
-                          type="button"
-                          className={styles.tableIconButton}
-                          title="View"
-                          aria-label="View solution"
-                          onClick={() =>
-                            this.handleView(Number(solution.Id))
-                          }
-                        >
-                          <Icon
-                            iconName="View"
-                            styles={{ root: { fontSize: 16 } }}
-                          />
-                        </button>
-
-                        <button
-                          type="button"
-                          className={styles.tableIconButton}
-                          title="Edit"
-                          aria-label="Edit solution"
-                          onClick={() =>
-                            this.handleEdit(Number(solution.Id))
-                          }
-                        >
-                          <Icon
-                            iconName="Edit"
-                            styles={{ root: { fontSize: 16 } }}
-                          />
-                        </button>
-
-                        <button
-                          type="button"
-                          className={styles.tableIconButton}
-                          title="Delete"
-                          aria-label="Delete solution"
-                          onClick={() =>
-                            this.handleDelete(Number(solution.Id))
-                          }
-                        >
-                          <Icon
-                            iconName="Delete"
-                            styles={{ root: { fontSize: 16 } }}
-                          />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <DetailsList
+              items={sortedSolutions}
+              columns={this.getColumns()}
+              setKey="myContributions"
+              selectionMode={SelectionMode.none}
+              layoutMode={DetailsListLayoutMode.justified}
+              isHeaderVisible={true}
+              compact={false}
+              className={styles.detailsList}
+            />
           </div>
         )}
       </div>
     );
   }
 }
-

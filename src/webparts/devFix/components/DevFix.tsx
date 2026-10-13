@@ -1,6 +1,12 @@
 
 import * as React from 'react';
-import { Icon } from '@fluentui/react';
+import {
+  Icon,
+  TextField,
+  Dropdown,
+  DefaultButton,
+  IconButton,
+} from '@fluentui/react';
 
 import styles from './DevFix.module.scss';
 import type { IDevFixProps } from './IDevFixProps';
@@ -58,22 +64,22 @@ interface IDevFixState {
   category: string;
   difficulty: string;
   page:
-    | 'home'
-    | 'solutions'
-    | 'favorites'
-    | 'details'
-    | 'my-contributions'
-    | 'add-solution'
-    | 'admin'
-    | 'manage-users';
+  | 'home'
+  | 'solutions'
+  | 'favorites'
+  | 'details'
+  | 'my-contributions'
+  | 'add-solution'
+  | 'admin'
+  | 'manage-users';
   selectedSolutionId: number | null;
   isAdminViewingSolution: boolean;
   returnPage:
-    | 'home'
-    | 'solutions'
-    | 'my-contributions'
-    | 'admin'
-    | 'favorites';
+  | 'home'
+  | 'solutions'
+  | 'my-contributions'
+  | 'admin'
+  | 'favorites';
 }
 
 export default class DevFix extends React.Component<
@@ -126,6 +132,7 @@ export default class DevFix extends React.Component<
       });
     }
   }
+
 
   private refreshSolutions = async (): Promise<void> => {
     try {
@@ -397,8 +404,8 @@ export default class DevFix extends React.Component<
 
     const myContributions = currentUser
       ? this.state.solutions.filter(
-          solution => solution.Author?.Id === currentUser.id
-        ).length
+        solution => solution.Author?.Id === currentUser.id
+      ).length
       : 0;
 
     if (page === 'details' && this.state.selectedSolutionId !== null) {
@@ -514,24 +521,24 @@ export default class DevFix extends React.Component<
       const selectedSolution =
         this.state.selectedSolutionId !== null
           ? this.state.solutions.find(
-              solution => solution.Id === this.state.selectedSolutionId
-            )
+            solution => solution.Id === this.state.selectedSolutionId
+          )
           : undefined;
 
       const editSolution: IAddSolutionInput | undefined =
         selectedSolution
           ? {
-              title: selectedSolution.Title || '',
-              technology: selectedSolution.Technology || '',
-              category: selectedSolution.Category || '',
-              difficulty: selectedSolution.Difficulty || '',
-              problem: selectedSolution.Problem || '',
-              errorMessage: selectedSolution.ErrorMessage || '',
-              cause: selectedSolution.Cause || '',
-              solution: selectedSolution.Solution || '',
-              lessonLearned: selectedSolution.LessonLearned || '',
-              tags: selectedSolution.Tags || ''
-            }
+            title: selectedSolution.Title || '',
+            technology: selectedSolution.Technology || '',
+            category: selectedSolution.Category || '',
+            difficulty: selectedSolution.Difficulty || '',
+            problem: selectedSolution.Problem || '',
+            errorMessage: selectedSolution.ErrorMessage || '',
+            cause: selectedSolution.Cause || '',
+            solution: selectedSolution.Solution || '',
+            lessonLearned: selectedSolution.LessonLearned || '',
+            tags: selectedSolution.Tags || ''
+          }
           : undefined;
 
       return (
@@ -671,84 +678,81 @@ export default class DevFix extends React.Component<
 
             <div className={styles.searchContainer}>
               <div className={styles.searchInputWrapper}>
-                <span className={styles.searchIcon}>🔍</span>
-
-                <input
-                  type="text"
+                <Icon iconName="Search" className={styles.searchIcon} />
+                <TextField
+                  borderless
                   placeholder="Search problems, errors, technologies..."
                   value={search}
-                  onChange={event =>
-                    this.setState({ search: event.target.value })
+                  onChange={(_, value) =>
+                    this.setState({ search: value || '' })
                   }
+                  ariaLabel="Search problems, errors, technologies"
                 />
               </div>
 
               <div className={styles.filterBar}>
-                <select
-                  value={technology}
-                  onChange={event =>
-                    this.setState({ technology: event.target.value })
+                <Dropdown
+                  className={styles.filterDropdown}
+                  placeholder="All Technologies"
+                  selectedKey={technology || undefined}
+                  options={[
+                    { key: '', text: 'All Technologies' },
+                    ...technologies.map(item => ({ key: item, text: item })),
+                  ]}
+                  onChange={(_, option) =>
+                    this.setState({
+                      technology: option?.key ? String(option.key) : '',
+                    })
                   }
-                  aria-label="Technology"
-                >
-                  <option value="">All Technologies</option>
-                  {technologies.map(item => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
+                  ariaLabel="Technology"
+                />
 
-                <select
-                  value={category}
-                  onChange={event =>
-                    this.setState({ category: event.target.value })
+                <Dropdown
+                  className={styles.filterDropdown}
+                  placeholder="All Categories"
+                  selectedKey={category || undefined}
+                  options={[
+                    { key: '', text: 'All Categories' },
+                    ...categories.map(item => ({ key: item, text: item })),
+                  ]}
+                  onChange={(_, option) =>
+                    this.setState({
+                      category: option?.key ? String(option.key) : '',
+                    })
                   }
-                  aria-label="Category"
-                >
-                  <option value="">All Categories</option>
-                  {categories.map(item => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
+                  ariaLabel="Category"
+                />
 
-                <select
-                  value={difficulty}
-                  onChange={event =>
-                    this.setState({ difficulty: event.target.value })
+                <Dropdown
+                  className={styles.filterDropdown}
+                  placeholder="All Difficulties"
+                  selectedKey={difficulty || undefined}
+                  options={[
+                    { key: '', text: 'All Difficulties' },
+                    ...difficulties.map(item => ({ key: item, text: item })),
+                  ]}
+                  onChange={(_, option) =>
+                    this.setState({
+                      difficulty: option?.key ? String(option.key) : '',
+                    })
                   }
-                  aria-label="Difficulty"
-                >
-                  <option value="">All Difficulties</option>
-                  {difficulties.map(item => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
+                  ariaLabel="Difficulty"
+                />
 
-                <button
-                  type="button"
+                <DefaultButton
                   className={styles.clearFilters}
-                  disabled={
-                    !search &&
-                    !technology &&
-                    !category &&
-                    !difficulty
-                  }
+                  disabled={!search && !technology && !category && !difficulty}
+                  text="Clear Filters"
+                  iconProps={{ iconName: 'Clear' }}
                   onClick={() =>
                     this.setState({
                       search: '',
                       technology: '',
                       category: '',
-                      difficulty: ''
+                      difficulty: '',
                     })
                   }
-                >
-                  ✕ Clear Filters
-                </button>
+                />
               </div>
             </div>
           </div>
@@ -823,12 +827,12 @@ export default class DevFix extends React.Component<
                     </p>
                   </div>
 
-                  <button
-                    type="button"
+                  <DefaultButton
+                    className={styles.browseButton}
+                    text="Browse all"
+                    iconProps={{ iconName: 'ChevronRight' }}
                     onClick={this.handleSolutions}
-                  >
-                    Browse all →
-                  </button>
+                  />
                 </div>
 
                 {filtered.length > 0 ? (
@@ -860,16 +864,12 @@ export default class DevFix extends React.Component<
                             </span>
                           </div>
 
-                          <button
-                            type="button"
+                          <IconButton
                             className={styles.favoriteButton}
-                            aria-label="Add to favorites"
-                            onClick={event =>
-                              event.stopPropagation()
-                            }
-                          >
-                            ⭐
-                          </button>
+                            ariaLabel="Add to favorites"
+                            iconProps={{ iconName: 'FavoriteStar' }}
+                            onClick={event => event.stopPropagation()}
+                          />
                         </div>
 
                         <h3>{solution.Title}</h3>
@@ -889,20 +889,17 @@ export default class DevFix extends React.Component<
                         </div>
 
                         <div className={styles.cardActions}>
-                          <button
-                            type="button"
+                          <DefaultButton
                             className={styles.helpfulButton}
-                            onClick={event =>
-                              event.stopPropagation()
-                            }
-                          >
-                            <Icon iconName="Like" />
-                            {solution.HelpfulCount}
-                          </button>
+                            iconProps={{ iconName: 'Like' }}
+                            text={String(solution.HelpfulCount)}
+                            onClick={event => event.stopPropagation()}
+                          />
 
-                          <button
-                            type="button"
+                          <DefaultButton
                             className={styles.viewSolutionButton}
+                            text="View Solution"
+                            iconProps={{ iconName: 'ChevronRight' }}
                             onClick={event => {
                               event.stopPropagation();
 
@@ -910,13 +907,10 @@ export default class DevFix extends React.Component<
                                 page: 'details',
                                 selectedSolutionId: solution.Id,
                                 isAdminViewingSolution: false,
-                                returnPage: 'solutions'
+                                returnPage: 'solutions',
                               });
                             }}
-                          >
-                            View Solution
-                            <Icon iconName="ChevronRight" />
-                          </button>
+                          />
                         </div>
                       </div>
                     ))}
@@ -983,20 +977,18 @@ export default class DevFix extends React.Component<
                           </span>
                         </div>
 
-                        <button
-                          type="button"
+                        <DefaultButton
                           className={styles.recentViewButton}
+                          text="View"
                           onClick={() =>
                             this.setState({
                               page: 'details',
                               selectedSolutionId: solution.Id,
                               isAdminViewingSolution: false,
-                              returnPage: 'solutions'
+                              returnPage: 'solutions',
                             })
                           }
-                        >
-                          View
-                        </button>
+                        />
                       </div>
                     ))}
                   </div>

@@ -1,6 +1,13 @@
-
 import * as React from 'react';
-import { Icon } from '@fluentui/react';
+import {
+  Icon,
+  DetailsList,
+  DetailsListLayoutMode,
+  SelectionMode,
+  IColumn,
+  DefaultButton,
+  PrimaryButton
+} from '@fluentui/react';
 import { WebPartContext } from '@microsoft/sp-webpart-base';
 
 import styles from './AdminDashboard.module.scss';
@@ -54,13 +61,7 @@ interface IAdminDashboardProps {
 }
 
 type TabType = 'All' | 'Published' | 'Pending Review' | 'Draft' | 'Rejected';
-
 type StatusType = 'Published' | 'Pending Review' | 'Draft' | 'Rejected';
-
-interface ITechnologyEntry {
-  technology: string;
-  count: number;
-}
 
 /* =====================================================
    STATUS SELECT
@@ -79,9 +80,7 @@ const StatusSelect: React.FC<IStatusSelectProps> = ({
 
   if (value === 'Published') {
     statusClass = styles.statusSelectPublished;
-  }
-
-  if (value === 'Pending Review') {
+  } else if (value === 'Pending Review') {
     statusClass = styles.statusSelectPending;
   }
 
@@ -118,6 +117,11 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
 }) => {
   const [activeTab, setActiveTab] = React.useState<TabType>('All');
   const [totalUsers, setTotalUsers] = React.useState<number>(0);
+  const [sortField, setSortField] = React.useState<string>('');
+  const [isSortedDescending, setIsSortedDescending] =
+    React.useState<boolean>(false);
+
+  /* LOAD USERS - EXISTING LOGIC */
 
   React.useEffect(() => {
     const loadUsers = async (): Promise<void> => {
@@ -178,9 +182,7 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
     }
   });
 
-  const technologyEntries: ITechnologyEntry[] = Object.keys(
-    technologyCounts
-  )
+  const technologyEntries = Object.keys(technologyCounts)
     .map(technology => ({
       technology,
       count: technologyCounts[technology]
@@ -197,7 +199,13 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
       return '-';
     }
 
-    return new Date(dateString).toLocaleDateString('en-US', {
+    const date = new Date(dateString);
+
+    if (isNaN(date.getTime())) {
+      return '-';
+    }
+
+    return date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric'
@@ -249,7 +257,7 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
     onEditSolution(solution.Id);
   };
 
-  /* DELETE */
+  /* DELETE - EXISTING LOGIC */
 
   const handleDelete = async (solution: ISolution): Promise<void> => {
     const confirmed = window.confirm(
@@ -270,7 +278,7 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
     }
   };
 
-  /* STATUS CHANGE */
+  /* STATUS CHANGE - EXISTING LOGIC */
 
   const handleStatusChange = async (
     solution: ISolution,
@@ -285,70 +293,209 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
     }
   };
 
-  /* SOLUTION TABLE ROW */
+  /* SORTING - UI ONLY */
 
-  const renderSolutionRow = (solution: ISolution): React.ReactNode => {
-    const status = solution.Status;
+  const handleColumnClick = (
+    _event?: React.MouseEvent<HTMLElement>,
+    column?: IColumn
+  ): void => {
+    if (!column || !column.fieldName) {
+      return;
+    }
 
-    const isValidStatus =
-      status === 'Published' ||
-      status === 'Pending Review' ||
-      status === 'Draft' ||
-      status === 'Rejected';
+    const clickedField = column.fieldName;
 
-    return (
-      <tr key={solution.Id} className={styles.tableRow}>
-        <td className={styles.solutionCell} title={solution.Title}>
-          {solution.Title}
-        </td>
+    if (sortField === clickedField) {
+      setIsSortedDescending(previous => !previous);
+    } else {
+      setSortField(clickedField);
+      setIsSortedDescending(false);
+    }
+  };
 
-        <td className={styles.tableCell}>
-          <span className={styles.technologyBadge}>
-            {solution.Technology || 'Other'}
+  const sortSolutions = (items: ISolution[]): ISolution[] => {
+    if (!sortField) {
+      return items;
+    }
+
+    return [...items].sort((first, second) => {
+      let firstValue: string | number = '';
+      let secondValue: string | number = '';
+
+      switch (sortField) {
+        case 'Title':
+          firstValue = first.Title || '';
+          secondValue = second.Title || '';
+          break;
+
+        case 'Technology':
+          firstValue = first.Technology || 'Other';
+          secondValue = second.Technology || 'Other';
+          break;
+
+        case 'AuthorTitle':
+          firstValue = first.Author?.Title || 'Unknown';
+          secondValue = second.Author?.Title || 'Unknown';
+          break;
+
+        case 'Status':
+          firstValue = first.Status || '';
+          secondValue = second.Status || '';
+          break;
+
+        case 'Created':
+          firstValue = first.Created
+            ? new Date(first.Created).getTime() || 0
+            : 0;
+          secondValue = second.Created
+            ? new Date(second.Created).getTime() || 0
+            : 0;
+          break;
+
+        default:
+          return 0;
+      }
+
+      let comparison = 0;
+
+      if (typeof firstValue === 'number' && typeof secondValue === 'number') {
+        comparison = firstValue - secondValue;
+      } else {
+        comparison = String(firstValue).localeCompare(
+          String(secondValue),
+          undefined,
+          { numeric: true, sensitivity: 'base' }
+        );
+      }
+
+      return isSortedDescending ? -comparison : comparison;
+    });
+  };
+
+  /* FLUENT UI DETAILS LIST COLUMNS */
+
+  const columns: IColumn[] = [
+    {
+      key: 'title',
+      name: 'SOLUTION',
+      fieldName: 'Title',
+      minWidth: 170,
+      maxWidth: 300,
+      isResizable: true,
+      isSorted: sortField === 'Title',
+      isSortedDescending: sortField === 'Title' && isSortedDescending,
+      onColumnClick: handleColumnClick,
+      onRender: (item: ISolution) => (
+        <span className={styles.solutionCell} title={item.Title}>
+          {item.Title || 'Untitled'}
+        </span>
+      )
+    },
+    {
+      key: 'technology',
+      name: 'TECHNOLOGY',
+      fieldName: 'Technology',
+      minWidth: 115,
+      maxWidth: 200,
+      isResizable: true,
+      isSorted: sortField === 'Technology',
+      isSortedDescending: sortField === 'Technology' && isSortedDescending,
+      onColumnClick: handleColumnClick,
+      onRender: (item: ISolution) => (
+        <span className={styles.technologyBadge}>
+          {item.Technology || 'Other'}
+        </span>
+      )
+    },
+    {
+      key: 'author',
+      name: 'AUTHOR',
+      fieldName: 'AuthorTitle',
+      minWidth: 110,
+      maxWidth: 200,
+      isResizable: true,
+      isSorted: sortField === 'AuthorTitle',
+      isSortedDescending: sortField === 'AuthorTitle' && isSortedDescending,
+      onColumnClick: handleColumnClick,
+      onRender: (item: ISolution) => (
+        <span className={styles.authorName}>
+          {item.Author?.Title || 'Unknown'}
+        </span>
+      )
+    },
+    {
+      key: 'status',
+      name: 'STATUS',
+      fieldName: 'Status',
+      minWidth: 145,
+      maxWidth: 190,
+      isResizable: true,
+      isSorted: sortField === 'Status',
+      isSortedDescending: sortField === 'Status' && isSortedDescending,
+      onColumnClick: handleColumnClick,
+      onRender: (item: ISolution) => {
+        const status = item.Status;
+
+        const isValidStatus =
+          status === 'Published' ||
+          status === 'Pending Review' ||
+          status === 'Draft' ||
+          status === 'Rejected';
+
+        return currentUser.role === 'ADMIN' && isValidStatus ? (
+          <StatusSelect
+            value={status as StatusType}
+            onChange={(newStatus: StatusType) =>
+              handleStatusChange(item, newStatus)
+            }
+          />
+        ) : (
+          <span
+            className={`${styles.statusBadge} ${
+              status === 'Published'
+                ? styles.statusPublished
+                : status === 'Pending Review'
+                  ? styles.statusPending
+                  : styles.statusDraft
+            }`}
+          >
+            <span className={styles.statusDot}>●</span>
+            {status}
           </span>
-        </td>
-
-        <td className={styles.tableCell}>
-          <span className={styles.authorName}>
-            {solution.Author?.Title || 'Unknown'}
-          </span>
-        </td>
-
-        <td className={styles.tableCell}>
-          {currentUser.role === 'ADMIN' && isValidStatus ? (
-            <StatusSelect
-              value={status as StatusType}
-              onChange={(newStatus: StatusType) =>
-                handleStatusChange(solution, newStatus)
-              }
-            />
-          ) : (
-            <span
-              className={`${styles.statusBadge} ${
-                status === 'Published'
-                  ? styles.statusPublished
-                  : status === 'Pending Review'
-                    ? styles.statusPending
-                    : styles.statusDraft
-              }`}
-            >
-              <span className={styles.statusDot}>●</span>
-              {status}
-            </span>
-          )}
-        </td>
-
-        <td className={styles.tableCell}>
-          {formatDate(solution.Created)}
-        </td>
-
-        <td className={styles.actionsCell}>
+        );
+      }
+    },
+    {
+      key: 'created',
+      name: 'CREATED',
+      fieldName: 'Created',
+      minWidth: 115,
+      maxWidth: 150,
+      isResizable: true,
+      isSorted: sortField === 'Created',
+      isSortedDescending: sortField === 'Created' && isSortedDescending,
+      onColumnClick: handleColumnClick,
+      onRender: (item: ISolution) => (
+        <span className={styles.createdCell}>
+          {formatDate(item.Created)}
+        </span>
+      )
+    },
+    {
+      key: 'actions',
+      name: 'ACTIONS',
+      fieldName: 'Actions',
+      minWidth: 115,
+      maxWidth: 125,
+      isResizable: false,
+      onRender: (item: ISolution) => (
+        <div className={styles.actionsCell}>
           <button
             type="button"
             title="View"
             aria-label="View solution"
             className={styles.iconButton}
-            onClick={() => handleView(solution)}
+            onClick={() => handleView(item)}
           >
             <Icon iconName="View" />
           </button>
@@ -358,7 +505,7 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
             title="Edit"
             aria-label="Edit solution"
             className={styles.iconButton}
-            onClick={() => handleEdit(solution)}
+            onClick={() => handleEdit(item)}
           >
             <Icon iconName="Edit" />
           </button>
@@ -368,12 +515,37 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
             title="Delete"
             aria-label="Delete solution"
             className={`${styles.iconButton} ${styles.deleteButton}`}
-            onClick={() => handleDelete(solution)}
+            onClick={() => handleDelete(item)}
           >
             <Icon iconName="Delete" />
           </button>
-        </td>
-      </tr>
+        </div>
+      )
+    }
+  ];
+
+  /* RENDER DETAILS LIST */
+
+  const renderSolutionsList = (
+    items: ISolution[],
+    emptyMessage: string,
+    listKey: string
+  ): React.ReactNode => {
+    if (items.length === 0) {
+      return <div className={styles.emptyCell}>{emptyMessage}</div>;
+    }
+
+    return (
+      <DetailsList
+        items={sortSolutions(items)}
+        columns={columns}
+        setKey={listKey}
+        selectionMode={SelectionMode.none}
+        layoutMode={DetailsListLayoutMode.fixedColumns}
+        isHeaderVisible={true}
+        compact={false}
+        className={styles.detailsList}
+      />
     );
   };
 
@@ -384,7 +556,7 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
       {/* HEADER */}
 
       <div className={styles.headerSection}>
-        <div>
+        <div className={styles.headerText}>
           <h1 className={styles.pageTitle}>Admin Dashboard</h1>
           <p className={styles.pageSubtitle}>
             Review submissions and keep the knowledge base healthy
@@ -392,22 +564,20 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
         </div>
 
         <div className={styles.headerButtons}>
-          <button
-            type="button"
-            className={styles.secondaryButton}
-            onClick={onAllSolutions}
-          >
-            All Solutions
-          </button>
+  <DefaultButton
+    text="All Solutions"
+    iconProps={{ iconName: 'KnowledgeArticle' }}
+    onClick={onAllSolutions}
+    className={styles.fluentButton}
+  />
 
-          <button
-            type="button"
-            className={styles.primaryButton}
-            onClick={onManageUsers}
-          >
-            Manage Users
-          </button>
-        </div>
+  <PrimaryButton
+    text="Manage Users"
+    iconProps={{ iconName: 'People' }}
+    onClick={onManageUsers}
+    className={styles.fluentPrimaryButton}
+  />
+</div>
       </div>
 
       {/* STAT CARDS */}
@@ -417,7 +587,6 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
           <div className={`${styles.statIcon} ${styles.totalIcon}`}>
             <Icon iconName="ReadingMode" styles={{ root: { fontSize: 25 } }} />
           </div>
-
           <div className={styles.statContent}>
             <div className={styles.statLabel}>Total Solutions</div>
             <div className={styles.statNumber}>{totalSolutions}</div>
@@ -428,7 +597,6 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
           <div className={`${styles.statIcon} ${styles.openIcon}`}>
             <Icon iconName="Clock" styles={{ root: { fontSize: 25 } }} />
           </div>
-
           <div className={styles.statContent}>
             <div className={styles.statLabel}>Open Solutions</div>
             <div className={styles.statNumber}>{pendingSolutions.length}</div>
@@ -440,7 +608,6 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
           <div className={`${styles.statIcon} ${styles.resolvedIcon}`}>
             <Icon iconName="Completed" styles={{ root: { fontSize: 25 } }} />
           </div>
-
           <div className={styles.statContent}>
             <div className={styles.statLabel}>Resolved Solutions</div>
             <div className={styles.statNumber}>{resolvedSolutions}</div>
@@ -452,7 +619,6 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
           <div className={`${styles.statIcon} ${styles.usersIcon}`}>
             <Icon iconName="People" styles={{ root: { fontSize: 25 } }} />
           </div>
-
           <div className={styles.statContent}>
             <div className={styles.statLabel}>Total Users</div>
             <div className={styles.statNumber}>{totalUsers}</div>
@@ -471,30 +637,11 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
         </div>
 
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th className={styles.tableHeader}>SOLUTION</th>
-                <th className={styles.tableHeader}>TECHNOLOGY</th>
-                <th className={styles.tableHeader}>AUTHOR</th>
-                <th className={styles.tableHeader}>STATUS</th>
-                <th className={styles.tableHeader}>CREATED</th>
-                <th className={styles.tableHeaderRight}>ACTIONS</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {pendingSolutions.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className={styles.emptyCell}>
-                    No pending solutions
-                  </td>
-                </tr>
-              ) : (
-                pendingSolutions.map(solution => renderSolutionRow(solution))
-              )}
-            </tbody>
-          </table>
+          {renderSolutionsList(
+            pendingSolutions,
+            'No pending solutions',
+            'pendingSolutions'
+          )}
         </div>
       </section>
 
@@ -529,30 +676,11 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
         </div>
 
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th className={styles.tableHeader}>SOLUTION</th>
-                <th className={styles.tableHeader}>TECHNOLOGY</th>
-                <th className={styles.tableHeader}>AUTHOR</th>
-                <th className={styles.tableHeader}>STATUS</th>
-                <th className={styles.tableHeader}>CREATED</th>
-                <th className={styles.tableHeaderRight}>ACTIONS</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredSolutions.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className={styles.emptyCell}>
-                    No solutions found
-                  </td>
-                </tr>
-              ) : (
-                filteredSolutions.map(solution => renderSolutionRow(solution))
-              )}
-            </tbody>
-          </table>
+          {renderSolutionsList(
+            filteredSolutions,
+            'No solutions found',
+            'allSolutions'
+          )}
         </div>
       </section>
 
@@ -574,10 +702,7 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
                   <div className={styles.techIcon}>
                     {getTechnologyIcon(entry.technology)}
                   </div>
-
-                  <span className={styles.techName}>
-                    {entry.technology}
-                  </span>
+                  <span className={styles.techName}>{entry.technology}</span>
                 </div>
 
                 <div className={styles.progressArea}>
@@ -587,7 +712,6 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
-
                   <span className={styles.techCount}>{entry.count}</span>
                 </div>
               </div>
@@ -605,4 +729,4 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
   );
 };
 
-export default AdminDashboard
+export default AdminDashboard;

@@ -1,230 +1,247 @@
 
+/* =========================================
+   SOLUTIONS PAGE
+========================================= */
+
 .solutionsPage {
   min-height: 100vh;
+  width: 100%;
+  padding: 36px 24px 60px;
+  box-sizing: border-box;
   background: #f8fafc;
-  padding: 40px 20px 70px;
   color: #111827;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.header,
+.filterCard,
+.resultInfo,
+.solutionGrid,
+.message,
+.emptyState {
+  width: 100%;
+  max-width: 1280px;
+  margin-right: auto;
+  margin-left: auto;
   box-sizing: border-box;
 }
 
 .header {
-  max-width: 1280px;
-  margin: 0 auto 30px;
-}
+  margin-bottom: 28px;
 
-.header h1 {
-  margin: 0;
-  font-size: 34px;
-  font-weight: 800;
-  letter-spacing: -0.8px;
-}
+  h1 {
+    margin: 0;
+    font-size: 34px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    overflow-wrap: anywhere;
+  }
 
-.header p {
-  margin: 8px 0 0;
-  color: #64748b;
-  font-size: 14px;
+  p {
+    margin: 10px 0 0;
+    color: #64748b;
+    font-size: 15px;
+    line-height: 1.6;
+  }
 }
 
 .backButton {
   margin-bottom: 22px;
-  font-family: "Segoe UI", sans-serif;
-  font-size: 13px;
+  min-height: 38px;
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+  background: #fff;
+  color: #475569;
   font-weight: 600;
+  font-family: "Segoe UI", sans-serif;
+
+  &:hover {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+    color: #6366f1;
+  }
 }
 
-.backButton:hover {
-  background: #eef2ff;
-  color: #6366f1;
-}
-
-/* ================================
-   FILTER CARD
-================================ */
+/* =========================================
+   FILTER PANEL
+========================================= */
 
 .filterCard {
-  max-width: 1280px;
-  margin: 0 auto 30px;
-  padding: 18px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  background: #ffffff;
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(140px, 1fr)) auto;
+  align-items: end;
+  gap: 14px;
+  margin-bottom: 28px;
+  padding: 20px;
+  background: #fff;
   border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
-  box-sizing: border-box;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
 
 .searchBox {
-  flex: 1 1 280px;
   min-width: 0;
-  display: flex;
-  align-items: center;
-  padding: 8px 13px;
+  padding: 5px 11px;
   border: 1px solid #dbe0e6;
-  border-radius: 9px;
-  background: #ffffff;
+  border-radius: 10px;
+  background: #fff;
   box-sizing: border-box;
-}
 
-/* Fluent UI TextField */
+  &:focus-within {
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  }
+}
 
 .searchField {
-  flex: 1;
+  width: 100%;
   min-width: 0;
-  width: 100%;
-}
 
-.searchField :global(.ms-TextField-wrapper),
-.searchField :global(.ms-TextField),
-.searchField :global(.ms-TextField-fieldGroup) {
-  width: 100%;
-  box-sizing: border-box;
-}
+  :global(.ms-TextField-fieldGroup) {
+    min-height: 36px;
+    border: none;
+    background: transparent;
+  }
 
-.searchField :global(.ms-TextField-fieldGroup) {
-  min-height: 26px;
-  border: none;
-  background: transparent;
-}
+  :global(.ms-TextField-fieldGroup::after) {
+    border: none;
+  }
 
-.searchField :global(.ms-TextField-fieldGroup::after) {
-  border: none;
-}
+  :global(.ms-TextField-field) {
+    padding: 0;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 13px;
+    color: #111827;
+    background: transparent;
+  }
 
-.searchField :global(.ms-TextField-field) {
-  padding: 0;
-  font-family: "Segoe UI", sans-serif;
-  font-size: 13px;
-  color: #111827;
-  background: transparent;
+  :global(.ms-TextField-field::placeholder) {
+    color: #94a3b8;
+  }
 }
-
-.searchField :global(.ms-TextField-field::placeholder) {
-  color: #94a3b8;
-}
-
-.searchField :global(.ms-TextField-field:focus) {
-  outline: none;
-}
-
-.searchBox:focus-within {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
-}
-
-/* Filter title */
 
 .filterTitle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  grid-column: 1 / -1;
+  margin-bottom: -4px;
   color: #475569;
   font-size: 13px;
   font-weight: 700;
-  white-space: nowrap;
 }
-
-/* Fluent UI Dropdown */
 
 .filterDropdown {
-  flex: 1 1 150px;
-  min-width: 150px;
-  max-width: 220px;
-}
-
-.filterDropdown :global(.ms-Dropdown) {
+  min-width: 0;
   width: 100%;
-}
 
-.filterDropdown :global(.ms-Dropdown-title) {
-  min-height: 38px;
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-  border: 1px solid #dbe0e6;
-  border-radius: 9px;
-  background: #ffffff;
-  color: #475569;
-  font-family: "Segoe UI", sans-serif;
-  font-size: 13px;
-  box-sizing: border-box;
-}
+  :global(.ms-Dropdown) {
+    width: 100%;
+  }
 
-.filterDropdown :global(.ms-Dropdown-title:hover) {
-  border-color: #a5b4fc;
-}
+  :global(.ms-Dropdown-title) {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border: 1px solid #dbe0e6;
+    border-radius: 9px;
+    background: #fff;
+    color: #475569;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 13px;
+    box-sizing: border-box;
+  }
 
-.filterDropdown :global(.ms-Dropdown-title:focus) {
-  border-color: #6366f1;
-  outline: none;
-}
+  :global(.ms-Dropdown-title:hover) {
+    border-color: #a5b4fc;
+  }
 
-.filterDropdown :global(.ms-Dropdown-caretDownWrapper) {
-  height: 100%;
+  :global(.ms-Dropdown-title:focus) {
+    border-color: #6366f1;
+  }
 }
-
-/* Clear filters */
 
 .clearFilters {
-  min-height: 38px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+  background: #fff;
   font-family: "Segoe UI", sans-serif;
   font-size: 13px;
-  font-weight: 500;
-  border-radius: 8px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &:hover {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+    color: #6366f1;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+  }
 }
 
-.clearFilters:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-.clearFilters:not(:disabled):hover {
-  background: #f1f5f9;
-  color: #111827;
-}
-
-/* ================================
+/* =========================================
    RESULTS
-================================ */
+========================================= */
 
 .resultInfo {
-  max-width: 1280px;
-  margin: 0 auto 18px;
+  margin-bottom: 18px;
   color: #64748b;
   font-size: 13px;
-}
 
-.resultInfo strong {
-  color: #111827;
+  strong {
+    color: #111827;
+  }
 }
 
 .solutionGrid {
-  max-width: 1280px;
-  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+  align-items: stretch;
+  gap: 22px;
 }
 
 .solutionCard {
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  background: #ffffff;
+  min-width: 0;
+  padding: 22px;
+  background: #fff;
   border: 1px solid #e5e7eb;
-  border-radius: 14px;
+  border-radius: 16px;
+  box-sizing: border-box;
   transition: transform 0.2s ease, box-shadow 0.2s ease,
     border-color 0.2s ease;
-  box-sizing: border-box;
-}
 
-.solutionCard:hover {
-  transform: translateY(-3px);
-  border-color: #c7d2fe;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  &:hover {
+    transform: translateY(-3px);
+    border-color: #c7d2fe;
+    box-shadow: 0 12px 28px rgba(79, 70, 229, 0.08);
+  }
+
+  h3 {
+    margin: 18px 0 9px;
+    color: #111827;
+    font-size: 18px;
+    line-height: 1.45;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  p {
+    min-height: 62px;
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }
 
 .cardTop {
@@ -236,9 +253,9 @@
 
 .cardBadges {
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
-  gap: 6px;
+  align-items: center;
+  gap: 7px;
   min-width: 0;
 }
 
@@ -249,10 +266,12 @@
 .hard {
   display: inline-flex;
   align-items: center;
-  padding: 4px 9px;
+  max-width: 100%;
+  padding: 5px 9px;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .techBadge {
@@ -280,393 +299,512 @@
   color: #dc2626;
 }
 
-/* Favorite Fluent UI IconButton */
-
 .favoriteButton {
   flex-shrink: 0;
-  min-width: 34px;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #ffffff;
+  border-radius: 10px;
+  background: #fff;
   color: #64748b;
-}
 
-.favoriteButton:hover {
-  border-color: #fbbf24;
-  background: #fffbeb;
-  color: #f59e0b;
-}
+  &:hover {
+    border-color: #fbbf24;
+    background: #fffbeb;
+    color: #f59e0b;
+  }
 
-.favoriteButton :global(.ms-Button-icon) {
-  color: inherit;
-}
-
-.solutionCard h3 {
-  margin: 18px 0 8px;
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1.4;
-  letter-spacing: -0.2px;
-  overflow-wrap: anywhere;
-}
-
-.solutionCard p {
-  margin: 0;
-  color: #64748b;
-  font-size: 13px;
-  line-height: 1.6;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  overflow-wrap: anywhere;
-  min-height: 62px;
+  :global(.ms-Button-icon) {
+    color: inherit;
+  }
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 14px;
+  gap: 7px;
+  margin-top: 16px;
 }
 
 .tag {
   max-width: 100%;
-  padding: 3px 8px;
+  padding: 4px 8px;
   border-radius: 6px;
   background: #f1f5f9;
   color: #64748b;
-  font-family: monospace;
+  font-family: Consolas, monospace;
   font-size: 11px;
   overflow-wrap: anywhere;
 }
-
-/* Card actions */
 
 .cardActions {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 10px;
-  margin-top: 18px;
-  padding-top: 15px;
-  border-top: 1px solid #f1f5f9;
+  margin-top: auto;
+  padding-top: 18px;
 }
-
-/* Fluent UI Helpful button */
 
 .helpfulButton {
-  min-height: 34px;
+  min-height: 36px;
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+  background: #fff;
+  color: #64748b;
   font-family: "Segoe UI", sans-serif;
   font-size: 12px;
-  font-weight: 500;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #64748b;
-}
 
-.helpfulButton:hover {
-  color: #6366f1;
-  border-color: #c7d2fe;
-  background: #eef2ff;
+  &:hover {
+    border-color: #c7d2fe;
+    background: #eef2ff;
+    color: #6366f1;
+  }
 }
-
-/* Fluent UI View Solution button */
 
 .viewSolutionButton {
-  min-height: 34px;
+  min-height: 38px;
+  border: 1px solid #6366f1;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  color: #fff;
   font-family: "Segoe UI", sans-serif;
   font-size: 13px;
   font-weight: 700;
-  border-radius: 8px;
-  background: #6366f1;
-  border-color: #6366f1;
+
+  &:hover {
+    border-color: #4f46e5;
+    background: #4f46e5;
+    color: #fff;
+  }
 }
 
-.viewSolutionButton:hover {
-  background: #4f46e5;
-  border-color: #4f46e5;
-}
-
-/* Empty and loading states */
-
-.emptyState,
-.message {
-  max-width: 1280px;
-  margin: 20px auto;
-  padding: 40px;
+.message,
+.emptyState {
+  margin-top: 24px;
+  padding: 38px 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #fff;
+  color: #64748b;
   text-align: center;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  color: #64748b;
-  box-sizing: border-box;
 }
 
-.emptyState h3 {
-  margin: 0 0 8px;
-  color: #111827;
-  font-size: 18px;
-}
+/* =========================================
+   SOLUTIONS PAGE RESPONSIVE
+========================================= */
 
-.emptyState p {
-  margin: 0;
-  color: #64748b;
-}
-
-/* ================================
-   ADD SOLUTION FORM
-   Existing form styles preserved
-================================ */
-
-.addSolutionPage {
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 42px 24px 70px;
-  box-sizing: border-box;
-}
-
-.addSolutionHeader {
-  margin-bottom: 28px;
-}
-
-.addSolutionHeader h1 {
-  margin: 0;
-  font-size: 34px;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.8px;
-  color: #111827;
-}
-
-.addSolutionHeader p {
-  margin: 8px 0 0;
-  color: #64748b;
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-.addSolutionForm {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 38px 40px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 18px;
-  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
-}
-
-.formField {
-  margin-bottom: 24px;
-}
-
-.formLabel {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.4;
-  color: #111827;
-}
-
-.required {
-  margin-left: 4px;
-  color: #dc2626;
-}
-
-.formInput,
-.formTextarea {
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid #d7dee8;
-  border-radius: 10px;
-  background: #ffffff;
-  color: #111827;
-  font-family: "Segoe UI", sans-serif;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.formInput {
-  height: 44px;
-  padding: 0 13px;
-}
-
-.formTextarea {
-  min-height: 92px;
-  padding: 11px 13px;
-  resize: vertical;
-  line-height: 1.5;
-}
-
-.formInput::placeholder,
-.formTextarea::placeholder {
-  color: #94a3b8;
-}
-
-.formInput:focus,
-.formTextarea:focus {
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-}
-
-.formInputError {
-  border-color: #dc2626;
-}
-
-.codeInput {
-  min-height: 80px;
-  font-family: Consolas, "Courier New", monospace;
-  font-size: 12px;
-}
-
-.formError {
-  display: block;
-  margin-top: 5px;
-  color: #dc2626;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.formHint {
-  display: block;
-  margin-top: 5px;
-  color: #64748b;
-  font-size: 12px;
-}
-
-.formThreeColumns {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-}
-
-.formActions {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 12px;
-  margin-top: 30px;
-  padding-top: 22px;
-  border-top: 1px solid #e5e7eb;
-}
-
-.cancelButton,
-.saveButton {
-  min-height: 42px;
-  padding: 0 18px;
-  border-radius: 9px;
-  font-family: "Segoe UI", sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease,
-    opacity 0.15s ease;
-}
-
-.cancelButton {
-  background: #ffffff;
-  border: 1px solid #d1d5db;
-  color: #374151;
-}
-
-.cancelButton:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-}
-
-.saveButton {
-  border: none;
-  background: #7c3aed;
-  color: #ffffff;
-  box-shadow: 0 2px 7px rgba(124, 58, 237, 0.2);
-}
-
-.saveButton:hover {
-  background: #6d28d9;
-}
-
-.cancelButton:disabled,
-.saveButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* ================================
-   RESPONSIVE LAYOUT
-================================ */
-
-@media screen and (max-width: 1000px) {
-  .solutionGrid {
+@media screen and (max-width: 1100px) {
+  .filterCard {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .filterCard {
-    align-items: stretch;
+  .searchBox {
+    grid-column: 1 / -1;
   }
 
-  .filterDropdown {
-    max-width: none;
+  .filterTitle {
+    grid-column: 1 / -1;
   }
 
-  .addSolutionPage {
-    max-width: 100%;
+  .solutionGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media screen and (max-width: 700px) {
   .solutionsPage {
-    padding: 30px 15px 50px;
+    padding: 26px 16px 40px;
   }
 
-  .header h1 {
-    font-size: 30px;
+  .header {
+    margin-bottom: 22px;
+
+    h1 {
+      font-size: 29px;
+    }
+
+    p {
+      font-size: 14px;
+    }
   }
 
-  .solutionGrid {
+  .filterCard {
     grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
+    gap: 12px;
+    padding: 15px;
+    border-radius: 13px;
   }
 
-  .searchBox {
-    flex-basis: 100%;
-    width: 100%;
-  }
-
+  .searchBox,
   .filterTitle {
-    width: 100%;
+    grid-column: auto;
   }
 
-  .filterDropdown {
-    flex: 1 1 100%;
+  .filterDropdown,
+  .clearFilters {
     width: 100%;
     min-width: 0;
   }
 
-  .clearFilters {
-    width: 100%;
+  .solutionGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 15px;
+  }
+
+  .solutionCard {
+    padding: 18px;
+    border-radius: 13px;
+  }
+
+  .solutionCard p {
+    min-height: 0;
   }
 
   .cardActions {
-    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .solutionsPage {
+    padding: 22px 12px 32px;
   }
 
+  .header h1 {
+    font-size: 26px;
+  }
+
+  .solutionCard {
+    padding: 15px;
+  }
+
+  .cardActions {
+    align-items: stretch;
+  }
+
+  .helpfulButton,
+  .viewSolutionButton {
+    flex: 1 1 auto;
+  }
+}
+
+/* =========================================
+   ADD / EDIT SOLUTION FORM
+   Fluent UI v8
+========================================= */
+
+.addSolutionPage {
+  width: 100%;
+  max-width: 1000px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 36px 24px 60px;
+  box-sizing: border-box;
+  background: #f8fafc;
+  color: #111827;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.addSolutionHeader {
+  width: 100%;
+  margin: 0 auto 26px;
+  box-sizing: border-box;
+
+  h1 {
+    margin: 0;
+    color: #111827;
+    font-size: 32px;
+    line-height: 1.25;
+    font-weight: 800;
+    letter-spacing: -0.7px;
+    overflow-wrap: anywhere;
+  }
+
+  p {
+    margin: 9px 0 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+
+.addSolutionForm {
+  width: 100%;
+  padding: 30px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+
+  /* Fluent UI TextField */
+
+  :global(.ms-TextField) {
+    width: 100%;
+  }
+
+  :global(.ms-TextField-fieldGroup) {
+    min-height: 42px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  :global(.ms-TextField-fieldGroup:hover) {
+    border-color: #a5b4fc;
+  }
+
+  :global(.ms-TextField-fieldGroup:focus-within) {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  }
+
+  :global(.ms-TextField-field) {
+    color: #111827;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 14px;
+  }
+
+  :global(.ms-TextField-field::placeholder) {
+    color: #94a3b8;
+    opacity: 1;
+  }
+
+  :global(.ms-TextField-fieldGroup textarea) {
+    min-height: 76px;
+    line-height: 1.6;
+    resize: vertical;
+  }
+
+  :global(.ms-TextField-errorMessage) {
+    margin-top: 5px;
+    color: #b91c1c;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  /* Fluent UI Dropdown */
+
+  :global(.ms-Dropdown) {
+    width: 100%;
+  }
+
+  :global(.ms-Dropdown-title) {
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    color: #111827;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+
+  :global(.ms-Dropdown-title:hover) {
+    border-color: #a5b4fc;
+  }
+
+  :global(.ms-Dropdown-title:focus) {
+    border-color: #6366f1;
+  }
+
+  :global(.ms-Dropdown-caretDownWrapper) {
+    height: 40px;
+  }
+}
+
+.formField {
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 22px;
+  box-sizing: border-box;
+}
+
+.formLabel {
+  display: block;
+  margin-bottom: 8px;
+  color: #334155;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.required {
+  margin-left: 4px;
+  color: #dc2626;
+  font-weight: 700;
+}
+
+/* Fluent UI TextField wrapper */
+
+.formInput {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+
+  :global(.ms-TextField-fieldGroup) {
+    width: 100%;
+  }
+}
+
+.formInputError {
+  :global(.ms-TextField-fieldGroup) {
+    border-color: #d13438;
+  }
+}
+
+.formTextarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.codeInput {
+  :global(.ms-TextField-field) {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+  }
+}
+
+.formError {
+  display: block;
+  margin-top: 5px;
+  color: #b91c1c;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.formHint {
+  display: block;
+  margin-top: 7px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Technology / Category / Difficulty */
+
+.formThreeColumns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+.formThreeColumns .formField {
+  margin-bottom: 22px;
+}
+
+/* Bottom actions */
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+  padding-top: 22px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Fluent UI buttons */
+
+.cancelButton,
+.saveButton {
+  min-height: 42px;
+  border-radius: 8px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+
+.cancelButton {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #475569;
+
+  &:hover {
+    border-color: #c7d2fe;
+    background: #eef2ff;
+    color: #4f46e5;
+  }
+}
+
+.saveButton {
+  border: 1px solid #7c3aed;
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  color: #fff;
+  font-weight: 700;
+  transition: background 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    border-color: #4f46e5;
+    background: #4f46e5;
+    color: #fff;
+  }
+}
+
+.cancelButton:global(.is-disabled),
+.saveButton:global(.is-disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   ADD / EDIT FORM RESPONSIVE
+========================================= */
+
+@media screen and (max-width: 800px) {
   .addSolutionPage {
-    padding: 28px 16px 40px;
+    padding: 28px 18px 42px;
   }
 
   .addSolutionHeader h1 {
-    font-size: 30px;
+    font-size: 29px;
   }
 
   .addSolutionForm {
-    padding: 24px 20px;
-    border-radius: 14px;
+    padding: 24px;
+  }
+
+  .formThreeColumns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .addSolutionPage {
+    padding: 22px 12px 32px;
+  }
+
+  .addSolutionHeader {
+    margin-bottom: 20px;
+
+    h1 {
+      font-size: 26px;
+    }
+
+    p {
+      font-size: 13px;
+    }
+  }
+
+  .addSolutionForm {
+    padding: 18px 14px;
+    border-radius: 13px;
   }
 
   .formThreeColumns {
@@ -674,9 +812,15 @@
     gap: 0;
   }
 
+  .formField,
+  .formThreeColumns .formField {
+    margin-bottom: 19px;
+  }
+
   .formActions {
     flex-direction: column-reverse;
     align-items: stretch;
+    gap: 10px;
   }
 
   .cancelButton,
@@ -685,26 +829,17 @@
   }
 }
 
-@media screen and (max-width: 450px) {
-  .solutionsPage {
-    padding-right: 12px;
-    padding-left: 12px;
-  }
-
-  .solutionCard {
-    padding: 16px;
-  }
-
-  .cardActions {
-    align-items: stretch;
-  }
-
+@media screen and (max-width: 380px) {
   .addSolutionPage {
-    padding: 24px 12px 35px;
+    padding: 18px 9px 26px;
   }
 
   .addSolutionForm {
-    padding: 20px 16px;
+    padding: 15px 11px;
+  }
+
+  .addSolutionHeader h1 {
+    font-size: 24px;
   }
 }
 
