@@ -13,6 +13,7 @@ import {
 
 import { SharePointService } from "../services/SharePointService";
 import { ICurrentUser } from "../services/UserService";
+import styles from "./Favorites.module.scss";
 
 export interface IFavoritesProps {
   sharePointService: SharePointService;
@@ -41,9 +42,9 @@ export default class Favorites extends React.Component<
     };
   }
 
- public componentDidMount(): void {
-  void this.loadFavorites();
-}
+  public componentDidMount(): void {
+    void this.loadFavorites();
+  }
 
   private async loadFavorites(): Promise<void> {
     try {
@@ -99,61 +100,29 @@ export default class Favorites extends React.Component<
     return (
       <Stack
         key={solution.Id}
+        className={styles.favoriteSolutionCard}
         tokens={{ childrenGap: 12 }}
-        styles={{
-          root: {
-            background: "#ffffff",
-            border: "1px solid #e5e7eb",
-            borderRadius: 12,
-            padding: 20,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-            minHeight: 240,
-            position: "relative"
-          }
-        }}
       >
         <IconButton
+          className={styles.removeFavoriteButton}
           title="Remove from favorites"
           ariaLabel="Remove from favorites"
           iconProps={{ iconName: "FavoriteStarFill" }}
           onClick={() =>
             this.removeFavorite(Number(solution.Id))
           }
-          styles={{
-            root: {
-              position: "absolute",
-              top: 12,
-              right: 12,
-              color: "#f59e0b"
-            },
-            icon: {
-              fontSize: 20
-            }
-          }}
         />
 
         <Text
           variant="small"
-          styles={{
-            root: {
-              color: "#6366f1",
-              fontWeight: 600,
-              paddingRight: 35
-            }
-          }}
+          className={styles.technology}
         >
           {solution.Technology || "Technology"}
         </Text>
 
         <Text
           variant="xLarge"
-          styles={{
-            root: {
-              fontWeight: 600,
-              color: "#111827",
-              paddingRight: 35
-            }
-          }}
+          className={styles.solutionTitle}
         >
           {solution.Title}
         </Text>
@@ -162,58 +131,50 @@ export default class Favorites extends React.Component<
           horizontal
           wrap
           tokens={{ childrenGap: 8 }}
+          className={styles.badges}
         >
           <Text
             variant="small"
-            styles={{
-              root: {
-                background: "#f3f4f6",
-                padding: "4px 8px",
-                borderRadius: 6
-              }
-            }}
+            className={styles.categoryBadge}
           >
             {solution.Category || "General"}
           </Text>
 
           <Text
             variant="small"
-            styles={{
-              root: {
-                background: "#f3f4f6",
-                padding: "4px 8px",
-                borderRadius: 6
-              }
-            }}
+            className={styles.difficultyBadge}
           >
             {solution.Difficulty || "N/A"}
           </Text>
         </Stack>
 
-        <Text
-          variant="medium"
-          styles={{
-            root: {
-              color: "#4b5563",
-              lineHeight: 1.5
-            }
-          }}
-        >
-          {solution.Problem || "No problem description available."}
-        </Text>
+        <div className={styles.problemSection}>
+          <Text
+            variant="small"
+            className={styles.problemLabel}
+          >
+            Problem
+          </Text>
 
-        <DefaultButton
-          text="View Solution"
-          onClick={() =>
-            this.props.onViewSolution(Number(solution.Id))
-          }
-          styles={{
-            root: {
-              borderRadius: 8,
-              marginTop: "auto"
+          <Text
+            variant="medium"
+            className={styles.problemText}
+          >
+            {solution.Problem ||
+              "No problem description available."}
+          </Text>
+        </div>
+
+        <div className={styles.cardFooter}>
+          <DefaultButton
+            className={styles.viewSolutionButton}
+            text="View Solution"
+            iconProps={{ iconName: "ChevronRight" }}
+            onClick={() =>
+              this.props.onViewSolution(Number(solution.Id))
             }
-          }}
-        />
+          />
+        </div>
       </Stack>
     );
   }
@@ -222,132 +183,82 @@ export default class Favorites extends React.Component<
     const { solutions, loading, error } = this.state;
 
     return (
-      <Stack
-        tokens={{ childrenGap: 24 }}
-        styles={{
-          root: {
-            padding: "32px 40px",
-            maxWidth: 1400,
-            margin: "0 auto",
-            width: "100%",
-            boxSizing: "border-box"
-          }
-        }}
-      >
-        <Stack tokens={{ childrenGap: 6 }}>
-          <Text
-            variant="xxLarge"
-            styles={{
-              root: {
-                fontWeight: 700,
-                color: "#111827"
-              }
-            }}
-          >
-            Favorites
-          </Text>
-
-          <Text
-            variant="medium"
-            styles={{
-              root: {
-                color: "#6b7280"
-              }
-            }}
-          >
-            Solutions you've saved for later
-          </Text>
-        </Stack>
-
-        {error && (
-          <MessageBar messageBarType={MessageBarType.error}>
-            {error}
-          </MessageBar>
-        )}
-
-        {loading && (
-          <Stack
-            horizontalAlign="center"
-            verticalAlign="center"
-            styles={{
-              root: {
-                minHeight: 250
-              }
-            }}
-          >
-            <Spinner label="Loading your favorites..." />
-          </Stack>
-        )}
-
-        {!loading && !error && solutions.length === 0 && (
-          <Stack
-            horizontalAlign="center"
-            verticalAlign="center"
-            tokens={{ childrenGap: 12 }}
-            styles={{
-              root: {
-                minHeight: 220,
-                background: "#f9fafb",
-                border: "1px dashed #d1d5db",
-                borderRadius: 12,
-                padding: 32,
-                textAlign: "center"
-              }
-            }}
-          >
-            <Icon
-              iconName="FavoriteStar"
-              styles={{
-                root: {
-                  fontSize: 32,
-                  color: "#9ca3af"
-                }
-              }}
-            />
-
+      <div className={styles.favoritesPage}>
+        <Stack
+          tokens={{ childrenGap: 24 }}
+          className={styles.favoritesContainer}
+        >
+          <div className={styles.pageHeader}>
             <Text
-              variant="xLarge"
-              styles={{
-                root: {
-                  fontWeight: 600,
-                  color: "#374151"
-                }
-              }}
+              variant="xxLarge"
+              className={styles.pageTitle}
             >
-              No favorite solutions yet
+              Favorites
             </Text>
 
             <Text
               variant="medium"
-              styles={{
-                root: {
-                  color: "#6b7280"
-                }
-              }}
+              className={styles.pageSubtitle}
             >
-              Your saved solutions will appear here.
+              Solutions you've saved for later
             </Text>
-          </Stack>
-        )}
+          </div>
 
-        {!loading && solutions.length > 0 && (
-          <Stack
-            styles={{
-              root: {
-                display: "grid",
-                gridTemplateColumns:
-                  "repeat(auto-fill, minmax(280px, 1fr))",
-                gap: 20
-              }
-            }}
-          >
-            {solutions.map(solution =>
-              this.renderSolutionCard(solution)
-            )}
-          </Stack>
-        )}
-      </Stack>
+          {error && (
+            <MessageBar
+              messageBarType={MessageBarType.error}
+            >
+              {error}
+            </MessageBar>
+          )}
+
+          {loading && (
+            <Stack
+              horizontalAlign="center"
+              verticalAlign="center"
+              className={styles.loadingState}
+            >
+              <Spinner label="Loading your favorites..." />
+            </Stack>
+          )}
+
+          {!loading && !error && solutions.length === 0 && (
+            <Stack
+              horizontalAlign="center"
+              verticalAlign="center"
+              tokens={{ childrenGap: 12 }}
+              className={styles.emptyState}
+            >
+              <Icon
+                iconName="FavoriteStar"
+                className={styles.emptyIcon}
+              />
+
+              <Text
+                variant="xLarge"
+                className={styles.emptyTitle}
+              >
+                No favorite solutions yet
+              </Text>
+
+              <Text
+                variant="medium"
+                className={styles.pageSubtitle}
+              >
+                Your saved solutions will appear here.
+              </Text>
+            </Stack>
+          )}
+
+          {!loading && !error && solutions.length > 0 && (
+            <div className={styles.favoriteGrid}>
+              {solutions.map(solution =>
+                this.renderSolutionCard(solution)
+              )}
+            </div>
+          )}
+        </Stack>
+      </div>
     );
   }
 }
-

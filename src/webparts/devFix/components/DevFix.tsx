@@ -285,7 +285,7 @@ export default class DevFix extends React.Component<
 
   private getPublishedSolutions(): ISolution[] {
     return this.state.solutions.filter(
-      solution => solution.Status === 'Published'
+      solution => solution.Status === 'Publish'
     );
   }
 
@@ -426,13 +426,17 @@ export default class DevFix extends React.Component<
           <SolutionDetails
             context={this.props.context}
             solutionId={this.state.selectedSolutionId}
-            onBack={() =>
+
+            onBack={async () => {
+              await this.refreshSolutions();
+
               this.setState({
                 page: this.state.returnPage,
                 selectedSolutionId: null,
                 isAdminViewingSolution: false
-              })
-            }
+              });
+            }}
+
           />
         </div>
       );

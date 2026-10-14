@@ -52,6 +52,7 @@ interface ISolutionDetailsState {
   helpfulLoading: boolean;
   currentUser: ICurrentUser | null;
   favoriteLoading: boolean;
+  isHelpful: boolean;
 }
 
 export default class SolutionDetails extends React.Component<
@@ -67,7 +68,8 @@ export default class SolutionDetails extends React.Component<
     error: "",
     helpfulLoading: false,
     currentUser: null,
-    favoriteLoading: false
+    favoriteLoading: false,
+    isHelpful: false,
   };
 
   constructor(props: ISolutionDetailsProps) {
@@ -105,12 +107,21 @@ export default class SolutionDetails extends React.Component<
           this.state.currentUser.id
         );
       }
+      let isHelpful = false;
+
+if (this.state.currentUser) {
+  isHelpful = await this.sharePointService.isHelpful(
+    this.props.solutionId,
+    this.state.currentUser.id
+  );
+}
 
       this.setState({
         solution: {
           ...(solution as ISolution),
           IsFavorite: isFavorite
         },
+         isHelpful: isHelpful,
         loading: false
       });
     } catch (error) {
@@ -123,32 +134,53 @@ export default class SolutionDetails extends React.Component<
     }
   }
 
-  private async handleHelpful(): Promise<void> {
-    if (!this.state.solution || this.state.helpfulLoading) {
-      return;
-    }
+ 
 
-    try {
-      this.setState({ helpfulLoading: true });
-
-      await this.sharePointService.markHelpful(
-        this.state.solution.Id
-      );
-
-      this.setState({
-        solution: {
-          ...this.state.solution,
-          HelpfulCount:
-            (this.state.solution.HelpfulCount || 0) + 1
-        },
-        helpfulLoading: false
-      });
-    } catch (error) {
-      console.error("Error marking solution as helpful:", error);
-
-      this.setState({ helpfulLoading: false });
-    }
+private async handleHelpful(): Promise<void> {
+  if (
+    !this.state.solution ||
+    !this.state.currentUser ||
+    this.state.helpfulLoading
+  ) {
+    return;
   }
+
+  try {
+    this.setState({ helpfulLoading: true });
+
+    const added = await this.sharePointService.markHelpful(
+      this.state.solution.Id,
+      this.state.currentUser.id
+    );
+
+    this.setState(prevState => ({
+      solution: prevState.solution
+        ? {
+            ...prevState.solution,
+            HelpfulCount: Math.max(
+              0,
+              (prevState.solution.HelpfulCount || 0) +
+                (added ? 1 : -1)
+            )
+          }
+        : null,
+      isHelpful: added,
+      helpfulLoading: false,
+      error: ""
+    }));
+  } catch (error) {
+    console.error("Error toggling helpful vote:", error);
+
+    this.setState({
+      helpfulLoading: false,
+      error: ""
+    });
+
+    await this.loadSolution();
+  }
+}
+
+
 
   private async handleFavorite(): Promise<void> {
     if (
@@ -346,7 +378,7 @@ export default class SolutionDetails extends React.Component<
                 this.getDifficultyClass(solution.Difficulty)
               )}
 
-              {solution.Status !== "Published" &&
+              {solution.Status !== "Publish" &&
                 this.renderBadge(
                   solution.Status,
                   styles.statusBadge
@@ -384,8 +416,9 @@ export default class SolutionDetails extends React.Component<
                   iconName="Like"
                   styles={{ root: { fontSize: 16 } }}
                 />
-                Helpful · {solution.HelpfulCount || 0}
-              </DefaultButton>
+{this.state.isHelpful ? "Marked Helpful" : "Helpful"}
+{" · "}
+{solution.HelpfulCount || 0}              </DefaultButton>
 
               <DefaultButton
                 className={styles.favoriteButton}

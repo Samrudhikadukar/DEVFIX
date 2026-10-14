@@ -128,7 +128,7 @@ export default class MyContributions extends React.Component<
 
   private getStatusClass(status: string): string {
     switch (status) {
-      case "Published":
+      case "Publish":
         return styles.published;
       case "Pending Review":
         return styles.pending;

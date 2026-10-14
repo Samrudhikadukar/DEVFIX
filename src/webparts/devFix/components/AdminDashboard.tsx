@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import {
   Icon,
@@ -60,44 +61,64 @@ interface IAdminDashboardProps {
   onManageUsers: () => void;
 }
 
-type TabType = 'All' | 'Published' | 'Pending Review' | 'Draft' | 'Rejected';
-type StatusType = 'Published' | 'Pending Review' | 'Draft' | 'Rejected';
-
 /* =====================================================
-   STATUS SELECT
+   STATUS BUTTONS
+   Choices come from SharePoint Status column
 ===================================================== */
 
-interface IStatusSelectProps {
-  value: StatusType;
-  onChange: (status: StatusType) => void;
+interface IStatusButtonsProps {
+  value: string;
+  choices: string[];
+  onChange: (status: string) => void;
 }
 
-const StatusSelect: React.FC<IStatusSelectProps> = ({
+const StatusButtons: React.FC<IStatusButtonsProps> = ({
   value,
+  choices,
   onChange
 }) => {
-  let statusClass = styles.statusSelectDraft;
-
-  if (value === 'Published') {
-    statusClass = styles.statusSelectPublished;
-  } else if (value === 'Pending Review') {
-    statusClass = styles.statusSelectPending;
-  }
-
   return (
-    <select
-      aria-label="Change status"
-      value={value}
-      onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
-        onChange(event.target.value as StatusType)
-      }
-      className={`${styles.statusSelect} ${statusClass}`}
-    >
-      <option value="Published">Published</option>
-      <option value="Pending Review">Pending Review</option>
-      <option value="Draft">Draft</option>
-      <option value="Rejected">Rejected</option>
-    </select>
+    <div className={styles.statusButtons}>
+      {choices.map(choice =>
+        choice === value ? (
+          <PrimaryButton
+            key={choice}
+            text={choice}
+            disabled
+            title={`Current status: ${choice}`}
+            styles={{
+              root: {
+                minWidth: 'auto',
+                minHeight: '28px',
+                height: '28px',
+                padding: '0 8px'
+              },
+              label: {
+                whiteSpace: 'nowrap'
+              }
+            }}
+          />
+        ) : (
+          <DefaultButton
+            key={choice}
+            text={choice}
+            title={`Change status to ${choice}`}
+            onClick={() => onChange(choice)}
+            styles={{
+              root: {
+                minWidth: 'auto',
+                minHeight: '28px',
+                height: '28px',
+                padding: '0 8px'
+              },
+              label: {
+                whiteSpace: 'nowrap'
+              }
+            }}
+          />
+        )
+      )}
+    </div>
   );
 };
 
@@ -115,11 +136,15 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
   onAllSolutions,
   onManageUsers
 }) => {
-  const [activeTab, setActiveTab] = React.useState<TabType>('All');
+  const [activeTab, setActiveTab] = React.useState<string>('All');
   const [totalUsers, setTotalUsers] = React.useState<number>(0);
   const [sortField, setSortField] = React.useState<string>('');
   const [isSortedDescending, setIsSortedDescending] =
     React.useState<boolean>(false);
+
+  // NEW: Actual Status Choice values from SharePoint
+  const [statusChoices, setStatusChoices] =
+    React.useState<string[]>([]);
 
   /* LOAD USERS - EXISTING LOGIC */
 
@@ -144,7 +169,36 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
     [context]
   );
 
-  /* STATISTICS */
+  /* LOAD STATUS CHOICES FROM SHAREPOINT */
+
+  React.useEffect(() => {
+    let isMounted = true;
+
+    const loadStatusChoices = async (): Promise<void> => {
+      try {
+        const choices = await spService.getChoiceValues('Status');
+
+        if (isMounted) {
+          setStatusChoices(choices);
+        }
+      } catch (error) {
+        console.error(
+          'Error loading Status choices from SharePoint:',
+          error
+        );
+      }
+    };
+
+    loadStatusChoices().catch(error => {
+      console.error('Failed to load Status choices:', error);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [spService]);
+
+  /* STATISTICS - EXISTING LOGIC */
 
   const totalSolutions = solutions.length;
 
@@ -153,7 +207,7 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
   );
 
   const publishedSolutions = solutions.filter(
-    solution => solution.Status === 'Published'
+    solution => solution.Status === 'Publish'
   );
 
   const resolvedSolutions = publishedSolutions.length;
@@ -190,7 +244,9 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
     .sort((a, b) => b.count - a.count);
 
   const maxTechnologyCount =
-    technologyEntries.length > 0 ? technologyEntries[0].count : 1;
+    technologyEntries.length > 0
+      ? technologyEntries[0].count
+      : 1;
 
   /* DATE FORMAT */
 
@@ -214,7 +270,9 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
 
   /* TECHNOLOGY ICON - FLUENT UI */
 
-  const getTechnologyIcon = (technology: string): React.ReactNode => {
+  const getTechnologyIcon = (
+    technology: string
+  ): React.ReactNode => {
     const tech = technology.toLowerCase();
     let iconName = 'Code';
 
@@ -242,7 +300,12 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
       iconName = 'Server';
     }
 
-    return <Icon iconName={iconName} styles={{ root: { fontSize: 20 } }} />;
+    return (
+      <Icon
+        iconName={iconName}
+        styles={{ root: { fontSize: 20 } }}
+      />
+    );
   };
 
   /* VIEW */
@@ -259,7 +322,9 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
 
   /* DELETE - EXISTING LOGIC */
 
-  const handleDelete = async (solution: ISolution): Promise<void> => {
+  const handleDelete = async (
+    solution: ISolution
+  ): Promise<void> => {
     const confirmed = window.confirm(
       `Are you sure you want to delete "${solution.Title}"?`
     );
@@ -278,14 +343,22 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
     }
   };
 
-  /* STATUS CHANGE - EXISTING LOGIC */
+  /* STATUS CHANGE */
 
   const handleStatusChange = async (
     solution: ISolution,
-    status: StatusType
+    status: string
   ): Promise<void> => {
+    if (solution.Status === status) {
+      return;
+    }
+
     try {
-      await spService.updateSolutionStatus(solution.Id, status);
+      await spService.updateSolutionStatus(
+        solution.Id,
+        status
+      );
+
       await onDataChanged();
     } catch (error) {
       console.error('Status change failed:', error);
@@ -293,7 +366,7 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
     }
   };
 
-  /* SORTING - UI ONLY */
+  /* SORTING - EXISTING LOGIC */
 
   const handleColumnClick = (
     _event?: React.MouseEvent<HTMLElement>,
@@ -313,7 +386,9 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
     }
   };
 
-  const sortSolutions = (items: ISolution[]): ISolution[] => {
+  const sortSolutions = (
+    items: ISolution[]
+  ): ISolution[] => {
     if (!sortField) {
       return items;
     }
@@ -358,17 +433,25 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
 
       let comparison = 0;
 
-      if (typeof firstValue === 'number' && typeof secondValue === 'number') {
+      if (
+        typeof firstValue === 'number' &&
+        typeof secondValue === 'number'
+      ) {
         comparison = firstValue - secondValue;
       } else {
         comparison = String(firstValue).localeCompare(
           String(secondValue),
           undefined,
-          { numeric: true, sensitivity: 'base' }
+          {
+            numeric: true,
+            sensitivity: 'base'
+          }
         );
       }
 
-      return isSortedDescending ? -comparison : comparison;
+      return isSortedDescending
+        ? -comparison
+        : comparison;
     });
   };
 
@@ -383,10 +466,14 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
       maxWidth: 300,
       isResizable: true,
       isSorted: sortField === 'Title',
-      isSortedDescending: sortField === 'Title' && isSortedDescending,
+      isSortedDescending:
+        sortField === 'Title' && isSortedDescending,
       onColumnClick: handleColumnClick,
       onRender: (item: ISolution) => (
-        <span className={styles.solutionCell} title={item.Title}>
+        <span
+          className={styles.solutionCell}
+          title={item.Title}
+        >
           {item.Title || 'Untitled'}
         </span>
       )
@@ -399,7 +486,8 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
       maxWidth: 200,
       isResizable: true,
       isSorted: sortField === 'Technology',
-      isSortedDescending: sortField === 'Technology' && isSortedDescending,
+      isSortedDescending:
+        sortField === 'Technology' && isSortedDescending,
       onColumnClick: handleColumnClick,
       onRender: (item: ISolution) => (
         <span className={styles.technologyBadge}>
@@ -415,7 +503,8 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
       maxWidth: 200,
       isResizable: true,
       isSorted: sortField === 'AuthorTitle',
-      isSortedDescending: sortField === 'AuthorTitle' && isSortedDescending,
+      isSortedDescending:
+        sortField === 'AuthorTitle' && isSortedDescending,
       onColumnClick: handleColumnClick,
       onRender: (item: ISolution) => (
         <span className={styles.authorName}>
@@ -427,40 +516,39 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
       key: 'status',
       name: 'STATUS',
       fieldName: 'Status',
-      minWidth: 145,
-      maxWidth: 190,
+      minWidth: 160,
+      maxWidth: 280,
       isResizable: true,
       isSorted: sortField === 'Status',
-      isSortedDescending: sortField === 'Status' && isSortedDescending,
+      isSortedDescending:
+        sortField === 'Status' && isSortedDescending,
       onColumnClick: handleColumnClick,
       onRender: (item: ISolution) => {
-        const status = item.Status;
+        const status = item.Status || '';
 
-        const isValidStatus =
-          status === 'Published' ||
-          status === 'Pending Review' ||
-          status === 'Draft' ||
-          status === 'Rejected';
+        if (currentUser.role === 'ADMIN') {
+          return (
+            <StatusButtons
+              value={status}
+              choices={statusChoices}
+              onChange={(newStatus: string) =>
+                handleStatusChange(item, newStatus)
+              }
+            />
+          );
+        }
 
-        return currentUser.role === 'ADMIN' && isValidStatus ? (
-          <StatusSelect
-            value={status as StatusType}
-            onChange={(newStatus: StatusType) =>
-              handleStatusChange(item, newStatus)
-            }
-          />
-        ) : (
+        return (
           <span
-            className={`${styles.statusBadge} ${
-              status === 'Published'
+            className={`${styles.statusBadge} ${status === 'Publish'
                 ? styles.statusPublished
                 : status === 'Pending Review'
                   ? styles.statusPending
                   : styles.statusDraft
-            }`}
+              }`}
           >
             <span className={styles.statusDot}>●</span>
-            {status}
+            {status || '-'}
           </span>
         );
       }
@@ -473,7 +561,8 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
       maxWidth: 150,
       isResizable: true,
       isSorted: sortField === 'Created',
-      isSortedDescending: sortField === 'Created' && isSortedDescending,
+      isSortedDescending:
+        sortField === 'Created' && isSortedDescending,
       onColumnClick: handleColumnClick,
       onRender: (item: ISolution) => (
         <span className={styles.createdCell}>
@@ -532,7 +621,11 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
     listKey: string
   ): React.ReactNode => {
     if (items.length === 0) {
-      return <div className={styles.emptyCell}>{emptyMessage}</div>;
+      return (
+        <div className={styles.emptyCell}>
+          {emptyMessage}
+        </div>
+      );
     }
 
     return (
@@ -549,7 +642,7 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
     );
   };
 
-  /* VIEW */
+  /* RENDER */
 
   return (
     <div className={styles.page}>
@@ -557,27 +650,29 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
 
       <div className={styles.headerSection}>
         <div className={styles.headerText}>
-          <h1 className={styles.pageTitle}>Admin Dashboard</h1>
+          <h1 className={styles.pageTitle}>
+            Admin Dashboard
+          </h1>
           <p className={styles.pageSubtitle}>
             Review submissions and keep the knowledge base healthy
           </p>
         </div>
 
         <div className={styles.headerButtons}>
-  <DefaultButton
-    text="All Solutions"
-    iconProps={{ iconName: 'KnowledgeArticle' }}
-    onClick={onAllSolutions}
-    className={styles.fluentButton}
-  />
+          <DefaultButton
+            text="All Solutions"
+            iconProps={{ iconName: 'KnowledgeArticle' }}
+            onClick={onAllSolutions}
+            className={styles.fluentButton}
+          />
 
-  <PrimaryButton
-    text="Manage Users"
-    iconProps={{ iconName: 'People' }}
-    onClick={onManageUsers}
-    className={styles.fluentPrimaryButton}
-  />
-</div>
+          <PrimaryButton
+            text="Manage Users"
+            iconProps={{ iconName: 'People' }}
+            onClick={onManageUsers}
+            className={styles.fluentPrimaryButton}
+          />
+        </div>
       </div>
 
       {/* STAT CARDS */}
@@ -585,43 +680,75 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
           <div className={`${styles.statIcon} ${styles.totalIcon}`}>
-            <Icon iconName="ReadingMode" styles={{ root: { fontSize: 25 } }} />
+            <Icon
+              iconName="ReadingMode"
+              styles={{ root: { fontSize: 25 } }}
+            />
           </div>
           <div className={styles.statContent}>
-            <div className={styles.statLabel}>Total Solutions</div>
-            <div className={styles.statNumber}>{totalSolutions}</div>
+            <div className={styles.statLabel}>
+              Total Solutions
+            </div>
+            <div className={styles.statNumber}>
+              {totalSolutions}
+            </div>
           </div>
         </div>
 
         <div className={styles.statCard}>
           <div className={`${styles.statIcon} ${styles.openIcon}`}>
-            <Icon iconName="Clock" styles={{ root: { fontSize: 25 } }} />
+            <Icon
+              iconName="Clock"
+              styles={{ root: { fontSize: 25 } }}
+            />
           </div>
           <div className={styles.statContent}>
-            <div className={styles.statLabel}>Open Solutions</div>
-            <div className={styles.statNumber}>{pendingSolutions.length}</div>
-            <div className={styles.statSmallText}>Pending review</div>
+            <div className={styles.statLabel}>
+              Open Solutions
+            </div>
+            <div className={styles.statNumber}>
+              {pendingSolutions.length}
+            </div>
+            <div className={styles.statSmallText}>
+              Pending review
+            </div>
           </div>
         </div>
 
         <div className={`${styles.statCard} ${styles.resolvedCard}`}>
           <div className={`${styles.statIcon} ${styles.resolvedIcon}`}>
-            <Icon iconName="Completed" styles={{ root: { fontSize: 25 } }} />
+            <Icon
+              iconName="Completed"
+              styles={{ root: { fontSize: 25 } }}
+            />
           </div>
           <div className={styles.statContent}>
-            <div className={styles.statLabel}>Resolved Solutions</div>
-            <div className={styles.statNumber}>{resolvedSolutions}</div>
-            <div className={styles.statSmallText}>Published</div>
+            <div className={styles.statLabel}>
+              Resolved Solutions
+            </div>
+            <div className={styles.statNumber}>
+              {resolvedSolutions}
+            </div>
+            <div className={styles.statSmallText}>
+              Publish
+            </div>
           </div>
         </div>
 
         <div className={styles.statCard}>
           <div className={`${styles.statIcon} ${styles.usersIcon}`}>
-            <Icon iconName="People" styles={{ root: { fontSize: 25 } }} />
+            <Icon
+              iconName="People"
+              styles={{ root: { fontSize: 25 } }}
+            />
           </div>
           <div className={styles.statContent}>
-            <div className={styles.statLabel}>Total Users</div>
-            <div className={styles.statNumber}>{totalUsers}</div>
+            <div className={styles.statLabel}>
+              Total Users
+            </div>
+            <div className={styles.statNumber}>
+              {totalUsers}
+            </div>
           </div>
         </div>
       </div>
@@ -630,7 +757,9 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
 
       <section className={styles.section}>
         <div className={styles.sectionHeading}>
-          <h2 className={styles.sectionTitle}>Pending Solutions</h2>
+          <h2 className={styles.sectionTitle}>
+            Pending Solutions
+          </h2>
           <p className={styles.sectionSubtitle}>
             Submissions waiting for approval
           </p>
@@ -649,25 +778,18 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
 
       <section className={styles.section}>
         <div className={styles.allSolutionsHeader}>
-          <h2 className={styles.sectionTitle}>All Solutions</h2>
+          <h2 className={styles.sectionTitle}>
+            All Solutions
+          </h2>
 
           <div className={styles.tabs}>
-            {(
-              [
-                'All',
-                'Published',
-                'Pending Review',
-                'Draft',
-                'Rejected'
-              ] as TabType[]
-            ).map(tab => (
+            {['All', ...statusChoices].map(tab => (
               <button
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
-                className={`${styles.tab} ${
-                  activeTab === tab ? styles.activeTab : ''
-                }`}
+                className={`${styles.tab} ${activeTab === tab ? styles.activeTab : ''
+                  }`}
               >
                 {tab}
               </button>
@@ -688,21 +810,31 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
 
       <section className={styles.technologySection}>
         <div>
-          <h2 className={styles.sectionTitle}>Technology Statistics</h2>
-          <p className={styles.sectionSubtitle}>Solutions per technology</p>
+          <h2 className={styles.sectionTitle}>
+            Technology Statistics
+          </h2>
+          <p className={styles.sectionSubtitle}>
+            Solutions per technology
+          </p>
         </div>
 
         <div className={styles.technologyCard}>
           {technologyEntries.map(entry => {
-            const percentage = (entry.count / maxTechnologyCount) * 100;
+            const percentage =
+              (entry.count / maxTechnologyCount) * 100;
 
             return (
-              <div key={entry.technology} className={styles.technologyRow}>
+              <div
+                key={entry.technology}
+                className={styles.technologyRow}
+              >
                 <div className={styles.techNameArea}>
                   <div className={styles.techIcon}>
                     {getTechnologyIcon(entry.technology)}
                   </div>
-                  <span className={styles.techName}>{entry.technology}</span>
+                  <span className={styles.techName}>
+                    {entry.technology}
+                  </span>
                 </div>
 
                 <div className={styles.progressArea}>
@@ -712,7 +844,9 @@ const AdminDashboard: React.FC<IAdminDashboardProps> = ({
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
-                  <span className={styles.techCount}>{entry.count}</span>
+                  <span className={styles.techCount}>
+                    {entry.count}
+                  </span>
                 </div>
               </div>
             );

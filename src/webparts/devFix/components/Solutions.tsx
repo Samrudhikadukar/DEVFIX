@@ -106,7 +106,7 @@ export default class Solutions extends React.Component<
     const searchText = search.trim().toLowerCase();
 
     return solutions.filter(solution => {
-      if (solution.Status !== 'Published') {
+      if (solution.Status !== 'Publish') {
         return false;
       }
 

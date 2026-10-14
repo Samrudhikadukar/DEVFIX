@@ -915,3 +915,11 @@
     min-width: 0;
   }
 }
+
+.statusButtons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+}
