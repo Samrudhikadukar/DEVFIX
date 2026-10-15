@@ -364,7 +364,7 @@ export default class Solutions extends React.Component<
                         </span>
                       </div>
 
-                      <IconButton
+                      {/* <IconButton
                         className={styles.favoriteButton}
                         iconProps={{
                           iconName: solution.IsFavorite
@@ -382,7 +382,7 @@ export default class Solutions extends React.Component<
                             : 'Add to favorites'
                         }
                         onClick={event => event?.stopPropagation()}
-                      />
+                      /> */}
                     </div>
 
                     {/* TITLE */}

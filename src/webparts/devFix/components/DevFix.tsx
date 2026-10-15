@@ -868,12 +868,12 @@ export default class DevFix extends React.Component<
                             </span>
                           </div>
 
-                          <IconButton
+                          {/* <IconButton
                             className={styles.favoriteButton}
                             ariaLabel="Add to favorites"
                             iconProps={{ iconName: 'FavoriteStar' }}
                             onClick={event => event.stopPropagation()}
-                          />
+                          /> */}
                         </div>
 
                         <h3>{solution.Title}</h3>
@@ -893,12 +893,12 @@ export default class DevFix extends React.Component<
                         </div>
 
                         <div className={styles.cardActions}>
-                          <DefaultButton
+                          {/* <DefaultButton
                             className={styles.helpfulButton}
                             iconProps={{ iconName: 'Like' }}
                             text={String(solution.HelpfulCount)}
                             onClick={event => event.stopPropagation()}
-                          />
+                          /> */}
 
                           <DefaultButton
                             className={styles.viewSolutionButton}

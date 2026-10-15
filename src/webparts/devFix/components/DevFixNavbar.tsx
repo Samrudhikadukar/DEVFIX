@@ -23,6 +23,7 @@ interface IDevFixNavbarProps {
 
 interface IDevFixNavbarState {
   isMobileMenuOpen: boolean;
+  activeTab: string;
 }
 
 export default class DevFixNavbar extends React.Component<
@@ -30,18 +31,21 @@ export default class DevFixNavbar extends React.Component<
   IDevFixNavbarState
 > {
   public state: IDevFixNavbarState = {
-    isMobileMenuOpen: false
+    isMobileMenuOpen: false,
+    activeTab: 'Home'
   };
 
   private handleNavigation = (
     event: React.MouseEvent<HTMLElement>,
-    callback: () => void
+    callback: () => void,
+    tabName: string
   ): void => {
     event.preventDefault();
     callback();
 
     this.setState({
-      isMobileMenuOpen: false
+      isMobileMenuOpen: false,
+      activeTab: tabName
     });
   };
 
@@ -53,7 +57,7 @@ export default class DevFixNavbar extends React.Component<
 
   public render(): React.ReactElement<IDevFixNavbarProps> {
     const { currentUser } = this.props;
-    const { isMobileMenuOpen } = this.state;
+    const { isMobileMenuOpen, activeTab } = this.state;
 
     return (
       <header className={styles.navbar}>
@@ -98,9 +102,11 @@ export default class DevFixNavbar extends React.Component<
         >
           <Link
             href="#"
-            className={styles.navLink}
+            className={`${styles.navLink} ${
+              activeTab === 'Home' ? styles.activeNavLink : ''
+            }`}
             onClick={event =>
-              this.handleNavigation(event, this.props.onHome)
+              this.handleNavigation(event, this.props.onHome, 'Home')
             }
           >
             <Icon iconName="Home" className={styles.navIcon} />
@@ -109,9 +115,15 @@ export default class DevFixNavbar extends React.Component<
 
           <Link
             href="#"
-            className={styles.navLink}
+            className={`${styles.navLink} ${
+              activeTab === 'Solutions' ? styles.activeNavLink : ''
+            }`}
             onClick={event =>
-              this.handleNavigation(event, this.props.onSolutions)
+              this.handleNavigation(
+                event,
+                this.props.onSolutions,
+                'Solutions'
+              )
             }
           >
             <Icon
@@ -123,9 +135,15 @@ export default class DevFixNavbar extends React.Component<
 
           <Link
             href="#"
-            className={styles.navLink}
+            className={`${styles.navLink} ${
+              activeTab === 'Favorites' ? styles.activeNavLink : ''
+            }`}
             onClick={event =>
-              this.handleNavigation(event, this.props.onFavorites)
+              this.handleNavigation(
+                event,
+                this.props.onFavorites,
+                'Favorites'
+              )
             }
           >
             <Icon
@@ -137,11 +155,16 @@ export default class DevFixNavbar extends React.Component<
 
           <Link
             href="#"
-            className={styles.navLink}
+            className={`${styles.navLink} ${
+              activeTab === 'My Contributions'
+                ? styles.activeNavLink
+                : ''
+            }`}
             onClick={event =>
               this.handleNavigation(
                 event,
-                this.props.onMyContributions
+                this.props.onMyContributions,
+                'My Contributions'
               )
             }
           >
@@ -152,9 +175,15 @@ export default class DevFixNavbar extends React.Component<
           {currentUser.role === 'ADMIN' && (
             <Link
               href="#"
-              className={styles.navLink}
+              className={`${styles.navLink} ${
+                activeTab === 'Admin' ? styles.activeNavLink : ''
+              }`}
               onClick={event =>
-                this.handleNavigation(event, this.props.onAdmin)
+                this.handleNavigation(
+                  event,
+                  this.props.onAdmin,
+                  'Admin'
+                )
               }
             >
               <Icon iconName="Shield" className={styles.navIcon} />
